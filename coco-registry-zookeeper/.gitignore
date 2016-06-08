@@ -1,0 +1,22 @@
+# Eclipse
+.classpath
+.project
+.settings/
+
+# Intellij
+.idea/
+*.iml
+*.iws
+
+# Mac
+.DS_Store
+
+# Maven
+log/
+target/
+soa-print-mem*
+soa-flush-mem*
+src/test/resource/logback.xml
+conf/*
+local_soa_conf/*
+local_soa_mem/*
