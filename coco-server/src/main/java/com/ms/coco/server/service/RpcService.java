@@ -1,4 +1,4 @@
-package com.ms.coco.server;
+package com.ms.coco.server.service;
 
 import org.springframework.stereotype.Component;
 

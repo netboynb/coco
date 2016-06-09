@@ -4,7 +4,7 @@ import java.util.concurrent.TimeoutException;
 
 import com.ms.coco.sample.api.HelloService;
 import com.ms.coco.sample.api.Person;
-import com.ms.coco.server.RpcService;
+import com.ms.coco.server.service.RpcService;
 
 @RpcService(HelloService.class)
 public class HelloServiceImpl implements HelloService {

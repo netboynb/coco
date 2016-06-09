@@ -15,13 +15,28 @@
         <constructor-arg name="zkAddress" value="${rpc.registry_address}"/>
     </bean>
 
-    <bean id="rpcServer" class="com.ms.coco.server.RpcServer">
+    <bean id="rpcServer" class="com.ms.coco.server.CocoServer">
         <constructor-arg name="serviceAddress" value="${rpc.service_address}"/>
         <constructor-arg name="serviceRegistry" ref="serviceRegistry"/>
         <property name="threadPoolInfo" ref="threadPoolInfo"/>
+        <property name="useRestFul" value ="true"/>
+        <property name="useRpc" value ="false"/>
+        <property name="restfulServer" ref="cocoRestServer"/>
     </bean>
     <bean id="threadPoolInfo" class="com.ms.coco.common.ThreadPoolInfo" >
     	<property name ="poolmaxSize" value="${poolmaxSize}"/>
     	<property name ="poolThreadAliveTimeInsecond" value="${poolThreadAliveTimeInsecond}"/>
     </bean>
+    <bean id="cocoRestServer" class="com.ms.coco.CocoRestServer">
+    	<property name="cocoConf" ref="cocoConf"/>
+    	<property name="cocoRoute" ref="cocoRoute"/>
+    	<property name="messageObserver" ref="messageObserver"/>
+    	<property name="postprocessor" ref="postprocessor"/>
+    	<property name="port" value ="8013"/>
+    </bean>
+    <bean id="cocoConf" class ="com.ms.coco.conf.DefaultCocoConf.DefaultCocoConf"/>
+    <bean id="cocoRoute" class ="com.ms.coco.echo.DemoCocoRoute.DemoCocoRoute"/>
+    <bean id="messageObserver" class ="com.ms.coco.common.CocoMessageObserver.CocoMessageObserver"/>
+    <bean id="postprocessor" class ="com.ms.coco.common.LastModifiedHeaderPostprocessor.LastModifiedHeaderPostprocessor"/>
+    
 </beans>
