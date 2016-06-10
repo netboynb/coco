@@ -14,11 +14,11 @@ import io.netty.bootstrap.Bootstrap;
  */
 public class DefaultCocoConf implements CocoConf {
 
-    private static final String NAME_PROPERTY = "serviceName";
-    private static final String PORT_PROPERTY = "port";
-    private static final String DEFAULT_FORMAT_PROPERTY = "defaultFormat";
-    private static final String WORKER_COUNT_PROPERTY = "workerCount";
-    private static final String EXECUTOR_THREAD_COUNT_PROPERTY = "executorThreadCount";
+    private static final String NAME_PROPERTY = "coco.restful.server.serviceName";
+    private static final String PORT_PROPERTY = "coco.restful.server.port";
+    private static final String DEFAULT_FORMAT_PROPERTY = "coco.restful.server.defaultFormat";
+    private static final String WORKER_COUNT_PROPERTY = "coco.restful.server.workerCount";
+    private static final String EXECUTOR_THREAD_COUNT_PROPERTY = "coco.restful.server.executorThreadCount";
 
     private static final int DEFAULT_WORKER_COUNT = 0;
     private static final int DEFAULT_EXECUTOR_THREAD_COUNT = 0;
@@ -28,7 +28,7 @@ public class DefaultCocoConf implements CocoConf {
     private String defaultFormat;
     private int workerCount;
     private int executorThreadCount;
-    private String fileName = "cocoConf.properties";
+    private String fileName = "cocoServerConf.properties";
     private boolean usePropertyConf = true;
 
     protected void fillValues(Properties p) {

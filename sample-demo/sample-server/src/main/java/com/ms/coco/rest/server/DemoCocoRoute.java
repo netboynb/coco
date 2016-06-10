@@ -1,4 +1,4 @@
-package com.ms.coco.echo;
+package com.ms.coco.rest.server;
 
 import org.restexpress.RestExpress;
 

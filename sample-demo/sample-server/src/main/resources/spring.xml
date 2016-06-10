@@ -7,35 +7,39 @@
        http://www.springframework.org/schema/context
        http://www.springframework.org/schema/context/spring-context.xsd">
 
-    <context:component-scan base-package="com.ms.coco.sample.server"/>
+    <context:component-scan base-package="com.ms.coco.rpc.server"/>
 
-    <context:property-placeholder location="classpath:rpc.properties"/>
+    <context:property-placeholder location="classpath:cocoServerConf.properties"/>
 
     <bean id="serviceRegistry" class="com.ms.coco.registry.zookeeper.ZooKeeperServiceRegistry">
-        <constructor-arg name="zkAddress" value="${rpc.registry_address}"/>
+        <constructor-arg name="zkAddress" value="${coco.rpc.server.registry_address}"/>
     </bean>
 
-    <bean id="rpcServer" class="com.ms.coco.server.CocoServer">
-        <constructor-arg name="serviceAddress" value="${rpc.service_address}"/>
+    <bean id="cocoServer" class="com.ms.coco.server.CocoServer">
+        <constructor-arg name="rpcPort" value="${coco.rpc.server.port}"/>
         <constructor-arg name="serviceRegistry" ref="serviceRegistry"/>
         <property name="threadPoolInfo" ref="threadPoolInfo"/>
         <property name="useRestFul" value ="true"/>
-        <property name="useRpc" value ="false"/>
+        <property name="useRpc" value ="true"/>
         <property name="restfulServer" ref="cocoRestServer"/>
+        <property name="localIp" value="${coco.rpc.server.ip}"/>
     </bean>
+    
     <bean id="threadPoolInfo" class="com.ms.coco.common.ThreadPoolInfo" >
-    	<property name ="poolmaxSize" value="${poolmaxSize}"/>
-    	<property name ="poolThreadAliveTimeInsecond" value="${poolThreadAliveTimeInsecond}"/>
+    	<property name ="poolmaxSize" value="${coco.rpc.server.poolmaxSize}"/>
+    	<property name ="poolThreadAliveTimeInsecond" value="${coco.rpc.server.poolThreadAliveTimeInsecond}"/>
     </bean>
+    
     <bean id="cocoRestServer" class="com.ms.coco.CocoRestServer">
     	<property name="cocoConf" ref="cocoConf"/>
     	<property name="cocoRoute" ref="cocoRoute"/>
     	<property name="messageObserver" ref="messageObserver"/>
     	<property name="postprocessor" ref="postprocessor"/>
-    	<property name="port" value ="8013"/>
+    	<property name="port" value ="${coco.restful.server.port}"/>
     </bean>
+    
     <bean id="cocoConf" class ="com.ms.coco.conf.DefaultCocoConf"/>
-    <bean id="cocoRoute" class ="com.ms.coco.echo.DemoCocoRoute"/>
+    <bean id="cocoRoute" class ="com.ms.coco.rest.server.DemoCocoRoute"/>
     <bean id="messageObserver" class ="com.ms.coco.common.CocoMessageObserver"/>
     <bean id="postprocessor" class ="com.ms.coco.common.LastModifiedHeaderPostprocessor"/>
     

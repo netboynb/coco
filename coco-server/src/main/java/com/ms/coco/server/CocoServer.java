@@ -1,5 +1,7 @@
 package com.ms.coco.server;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -38,7 +40,8 @@ public class CocoServer implements ApplicationContextAware, InitializingBean {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CocoServer.class);
 
-    private String serviceAddress;
+    private Integer rpcPort = 8089;
+    private String localIp;
     private int ioWorkerNum = Runtime.getRuntime().availableProcessors() * 2;
     private ServiceRegistry serviceRegistry;
     private ThreadPoolInfo threadPoolInfo = new ThreadPoolInfo();
@@ -51,12 +54,12 @@ public class CocoServer implements ApplicationContextAware, InitializingBean {
      */
     private Map<String, Object> handlerMap = new HashMap<>();
 
-    public CocoServer(String serviceAddress) {
-        this.serviceAddress = serviceAddress;
+    public CocoServer(Integer rpcPort) {
+        this.rpcPort = rpcPort;
     }
 
-    public CocoServer(String serviceAddress, ServiceRegistry serviceRegistry) {
-        this.serviceAddress = serviceAddress;
+    public CocoServer(Integer rpcPort, ServiceRegistry serviceRegistry) {
+        this.rpcPort = rpcPort;
         this.serviceRegistry = serviceRegistry;
     }
 
@@ -92,12 +95,12 @@ public class CocoServer implements ApplicationContextAware, InitializingBean {
             EventLoopGroup bossGroup = new NioEventLoopGroup();
             EventLoopGroup workerGroup = new NioEventLoopGroup(ioWorkerNum);
             try {
+                // init and start rpc netty server
+                LOGGER.info("rpc-netty-server will be started");
                 ExecutorService workerExecutorService =
                         ThreadPoolHolder.getStandardFixedPool(threadPoolInfo.getThreadPoolName(),
                                 threadPoolInfo.getPoolMinSize(), threadPoolInfo.getPoolmaxSize(),
                                 threadPoolInfo.getPoolQueueSize(), threadPoolInfo.getPoolThreadAliveTimeInsecond());
-
-                // 创建并初始化 Netty 服务端 Bootstrap 对象
                 ServerBootstrap bootstrap = new ServerBootstrap();
                 bootstrap.group(bossGroup, workerGroup);
                 bootstrap.channel(NioServerSocketChannel.class);
@@ -105,25 +108,20 @@ public class CocoServer implements ApplicationContextAware, InitializingBean {
                         new RpcChannelInitializer(handlerMap, workerExecutorService).setThreadPoolInfo(threadPoolInfo));
                 bootstrap.option(ChannelOption.SO_BACKLOG, 1024);
                 bootstrap.childOption(ChannelOption.SO_KEEPALIVE, true);
-
-                // 获取 RPC 服务器的 IP 地址与端口号
-                String[] addressArray = StringUtil.split(serviceAddress, ":");
-                String ip = addressArray[0];
-                int port = Integer.parseInt(addressArray[1]);
-                // 启动 RPC 服务器
-                ChannelFuture future = bootstrap.bind(ip, port).sync();
-
+                localIp = getLocalHostIp();
+                ChannelFuture future = bootstrap.bind(localIp, rpcPort).sync();
+                LOGGER.info(" end start rpc-netty server ");
                 // start restful server
                 if (useRestFul) {
                     restfulServer.start();
                 }
-
-                serviceRegistry();
-                LOGGER.debug("server started on port {}", port);
-                // 关闭 RPC 服务器
+                String serviceAddress = localIp + ":" + rpcPort;
+                serviceRegistry(serviceAddress);
+                LOGGER.info("rpc-netty-server started on ip={}, port {}", localIp, rpcPort);
+                // black for RPC netty server close
                 future.channel().closeFuture().sync();
             } catch (Exception e) {
-                throw new RpcServiceException("init netty server error");
+                throw new RpcServiceException("start rpc-netty-server error");
             } finally {
                 workerGroup.shutdownGracefully();
                 bossGroup.shutdownGracefully();
@@ -135,7 +133,7 @@ public class CocoServer implements ApplicationContextAware, InitializingBean {
 
     }
 
-    private void serviceRegistry() {
+    private void serviceRegistry(String serviceAddress) {
         // 注册 RPC 服务地址
         if (serviceRegistry != null) {
             for (String interfaceName : handlerMap.keySet()) {
@@ -145,12 +143,16 @@ public class CocoServer implements ApplicationContextAware, InitializingBean {
         }
     }
 
-    public String getServiceAddress() {
-        return serviceAddress;
-    }
-
-    public void setServiceAddress(String serviceAddress) {
-        this.serviceAddress = serviceAddress;
+    private String getLocalHostIp() throws UnknownHostException {
+        if (localIp != null) {
+            // 用于处理多网卡的主机
+            return localIp;
+        }
+        /** 返回本地主机。 */
+        InetAddress addr = InetAddress.getLocalHost();
+        /** 返回 IP 地址字符串（以文本表现形式） */
+        String ip = addr.getHostAddress();
+        return ip;
     }
 
     public int getIoWorkerNum() {
@@ -195,6 +197,14 @@ public class CocoServer implements ApplicationContextAware, InitializingBean {
 
     public void setRestfulServer(CocoRestServer restfulServer) {
         this.restfulServer = restfulServer;
+    }
+
+    public void setRpcPort(Integer rpcPort) {
+        this.rpcPort = rpcPort;
+    }
+
+    public void setLocalIp(String localIp) {
+        this.localIp = localIp;
     }
 
 }

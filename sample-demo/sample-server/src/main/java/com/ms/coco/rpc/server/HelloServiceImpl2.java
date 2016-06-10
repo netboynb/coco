@@ -1,4 +1,4 @@
-package com.ms.coco.sample.server;
+package com.ms.coco.rpc.server;
 
 import java.util.concurrent.TimeoutException;
 
