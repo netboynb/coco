@@ -1,8 +1,9 @@
 package com.ms.coco;
 
-import org.restexpress.RestExpress;
 import org.restexpress.pipeline.MessageObserver;
 import org.restexpress.pipeline.Postprocessor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.ms.coco.common.CocoMapExceptions;
 import com.ms.coco.common.CocoMessageObserver;
@@ -17,13 +18,16 @@ import com.ms.coco.serialization.SerializationProvider;
  * @func
  */
 public class CocoRestServer {
+    private static final Logger LOGGER = LoggerFactory.getLogger(CocoRestServer.class);
     private CocoConf cocoConf;
     private CocoRoute cocoRoute;
     private CocoMapExceptions cocoMapExceptions;
     private MessageObserver messageObserver;
     private Postprocessor postprocessor;
     private Integer port = 8089;
+
     public void init() {
+        LOGGER.info("start init cocoRestServer");
         if (cocoConf == null) {
 
         } else {
@@ -39,15 +43,20 @@ public class CocoRestServer {
         if (cocoMapExceptions != null) {
             cocoMapExceptions.init();
         }
+        LOGGER.info("end init cocoRestServer");
 
     }
-    public void start(){
-        RestExpress.setDefaultSerializationProvider(new SerializationProvider());
+
+    public void start() {
+        LOGGER.info(" cocoRestServer will be started");
+        CocoRestExpress.setDefaultSerializationProvider(new SerializationProvider());
 
         if (cocoConf.getPort() != null) {
             port = cocoConf.getPort();
         }
-        RestExpress server = new RestExpress().setName(cocoConf.getServiceName()).setPort(port);
+        CocoRestExpress server = new CocoRestExpress();
+        server.setName(cocoConf.getServiceName());
+        server.setPort(port);
         if (messageObserver != null) {
             server.addMessageObserver(messageObserver);
         } else {
@@ -77,6 +86,7 @@ public class CocoRestServer {
         }
         server.bind();
         server.awaitShutdown();
+        LOGGER.info("cocoRestServer started ,on port={}", port);
     }
 
     public void setCocoConf(CocoConf cocoConf) {
