@@ -130,7 +130,7 @@ public class CocoServer implements ApplicationContextAware, InitializingBean {
             }
         }
         if (useRestFul) {
-
+            restfulServer.start();
         }
 
     }

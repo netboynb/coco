@@ -34,9 +34,9 @@
     	<property name="postprocessor" ref="postprocessor"/>
     	<property name="port" value ="8013"/>
     </bean>
-    <bean id="cocoConf" class ="com.ms.coco.conf.DefaultCocoConf.DefaultCocoConf"/>
-    <bean id="cocoRoute" class ="com.ms.coco.echo.DemoCocoRoute.DemoCocoRoute"/>
-    <bean id="messageObserver" class ="com.ms.coco.common.CocoMessageObserver.CocoMessageObserver"/>
-    <bean id="postprocessor" class ="com.ms.coco.common.LastModifiedHeaderPostprocessor.LastModifiedHeaderPostprocessor"/>
+    <bean id="cocoConf" class ="com.ms.coco.conf.DefaultCocoConf"/>
+    <bean id="cocoRoute" class ="com.ms.coco.echo.DemoCocoRoute"/>
+    <bean id="messageObserver" class ="com.ms.coco.common.CocoMessageObserver"/>
+    <bean id="postprocessor" class ="com.ms.coco.common.LastModifiedHeaderPostprocessor"/>
     
 </beans>

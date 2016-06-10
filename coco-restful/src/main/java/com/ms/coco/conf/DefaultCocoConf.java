@@ -29,7 +29,7 @@ public class DefaultCocoConf implements CocoConf {
     private int workerCount;
     private int executorThreadCount;
     private String fileName = "cocoConf.properties";
-
+    private boolean usePropertyConf = true;
 
     protected void fillValues(Properties p) {
         this.serviceName = p.getProperty(NAME_PROPERTY, RestExpress.DEFAULT_NAME);
@@ -42,14 +42,16 @@ public class DefaultCocoConf implements CocoConf {
 
     @Override
     public void init() {
-        Properties prop = new Properties();
+        if (usePropertyConf) {
+            Properties prop = new Properties();
 
-        try {
-            prop.load(Bootstrap.class.getClassLoader().getResourceAsStream(fileName));
-        } catch (Exception e) {
-            throw new RuntimeException("load " + fileName + " error", e);
+            try {
+                prop.load(Bootstrap.class.getClassLoader().getResourceAsStream(fileName));
+            } catch (Exception e) {
+                throw new RuntimeException("load " + fileName + " error", e);
+            }
+            fillValues(prop);
         }
-        fillValues(prop);
     }
 
 
@@ -101,6 +103,14 @@ public class DefaultCocoConf implements CocoConf {
 
     public void setExecutorThreadCount(int executorThreadCount) {
         this.executorThreadCount = executorThreadCount;
+    }
+
+    public boolean isUsePropertyConf() {
+        return usePropertyConf;
+    }
+
+    public void setUsePropertyConf(boolean usePropertyConf) {
+        this.usePropertyConf = usePropertyConf;
     }
 
 }
