@@ -1,5 +1,6 @@
 
-# coco
+# coco  
+# use rpc and restful idea to realize SOA framework
 
 # quick start 
 
