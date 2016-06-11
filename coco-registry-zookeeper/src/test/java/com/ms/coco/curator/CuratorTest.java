@@ -2,20 +2,11 @@ package com.ms.coco.curator;
 
 import java.io.IOException;
 
-import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
-import org.apache.curator.framework.CuratorFrameworkFactory;
-import org.apache.curator.framework.recipes.cache.NodeCache;
-import org.apache.curator.framework.recipes.cache.NodeCacheListener;
-import org.apache.curator.framework.recipes.cache.PathChildrenCache;
-import org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent;
-import org.apache.curator.framework.recipes.cache.PathChildrenCacheListener;
 import org.apache.curator.framework.recipes.cache.TreeCache;
 import org.apache.curator.framework.recipes.cache.TreeCacheEvent;
 import org.apache.curator.framework.recipes.cache.TreeCacheListener;
-import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.curator.test.TestingServer;
-import org.apache.zookeeper.data.Stat;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Joiner;
+import com.ms.coco.registry.zk.common.RegisterHolder;
 
 import junit.framework.Assert;
 
@@ -36,8 +28,8 @@ public class CuratorTest {
 
     private static final Logger logger = LoggerFactory.getLogger(CuratorTest.class);
 
-    TestingServer zkServer;
-    CuratorFramework curator;
+    TestingServer zkTestServer;
+    CuratorFramework client;
     String namespace = "micro-service";
     String serviceNode = "service";
     String groupNode = "group";
@@ -50,26 +42,30 @@ public class CuratorTest {
     String groupProxyPath;
     String ipProxyPath;
     String balancePath;
+    String group_1_path;
+    String group_2_path;
 
     @Before
     public void before() throws Exception {
-        zkServer = new TestingServer(2182);
+        zkTestServer = new TestingServer(2182);
 
-        zkServer.start();
-
-        RetryPolicy retryPolicy = new ExponentialBackoffRetry(1000, 3);
-        CuratorFrameworkFactory.Builder cfb = CuratorFrameworkFactory.builder();
-        cfb.connectString("localhost:" + zkServer.getPort());
-        cfb.defaultData("{}".getBytes());
-        cfb.retryPolicy(retryPolicy);
-
-        curator = cfb.build();
-        curator.start();
+        zkTestServer.start();
+        String registerUrl = zkTestServer.getConnectString();
+        client = RegisterHolder.getClient(registerUrl);
         servicePath = joinNodePath(namespace, serviceNode);
         groupPath = joinNodePath(namespace, groupNode);
-        groupProxyPath = joinNodePath(namespace, groupNode, groupProxyNode);
-        ipProxyPath = joinNodePath(namespace, groupNode, ipProxyNode);
-
+        group_1_path = joinNodePath(namespace, groupNode, "group_1");
+        group_2_path = joinNodePath(namespace, groupNode, "group_2");
+        groupProxyPath = joinNodePath(namespace, proxyNode, groupProxyNode);
+        ipProxyPath = joinNodePath(namespace, proxyNode, ipProxyNode);
+        balancePath = joinNodePath(namespace, balanceNode);
+        client.create().forPath(servicePath);
+        client.create().forPath(groupPath);
+        client.create().forPath(group_1_path);
+        client.create().forPath(group_2_path);
+        client.create().forPath(groupProxyPath);
+        client.create().forPath(ipProxyPath);
+        client.create().forPath(balancePath);
 
     }
 
@@ -81,132 +77,22 @@ public class CuratorTest {
 
     @After
     public void after() throws IOException {
-        if (curator != null) {
-            curator.close();
+        if (client != null) {
+            client.close();
         }
-        if (zkServer != null) {
-            zkServer.close();
+        if (zkTestServer != null) {
+            zkTestServer.close();
         }
 
     }
-
-    @Test
-    public void test_namespace() throws Exception {
-        CuratorFramework zk = curator.usingNamespace("namespace-test");
-        zk.create().forPath("/group-1");
-
-        Stat stat = zk.checkExists().forPath("/group-1");
-        Assert.assertNotNull(stat);
-
-        boolean pathCreated = zk.getZookeeperClient().getZooKeeper().exists("/namespace-test/group-1", false) != null;
-        Assert.assertTrue(pathCreated);
-    }
-
-    @Test
-    public void test_path_cache() throws Exception {
-        CuratorFramework zk = curator.usingNamespace("namespace-test");
-        String groupPath = "/group-1";
-        String s = zk.create().forPath(groupPath);
-        Assert.assertEquals(groupPath, s);
-        Stat stat = zk.checkExists().forPath("/group-1");
-        Assert.assertNotNull(stat);
-        stat = zk.checkExists().forPath("/namespace-test/group-1");
-        Assert.assertNull(stat);
-
-        final PathChildrenCacheEvent.Type[] saveEventType = new PathChildrenCacheEvent.Type[1];
-        final long[] saveTime = new long[1];
-        PathChildrenCache pcc = new PathChildrenCache(zk, groupPath, true);
-        pcc.start();
-        pcc.getListenable().addListener(new PathChildrenCacheListener() {
-            @Override
-            public void childEvent(CuratorFramework client, PathChildrenCacheEvent event) throws Exception {
-                logger.info("event type={}", event.getType());
-                switch (event.getType()) {
-                    case CHILD_ADDED:
-                        saveEventType[0] = PathChildrenCacheEvent.Type.CHILD_ADDED;
-                        saveTime[0] = System.currentTimeMillis();
-                        logger.info("child[path={}, date={}] added", event.getData().getPath(),
-                                new String(event.getData().getData()));
-                        break;
-                    case CHILD_UPDATED:
-                        saveEventType[0] = PathChildrenCacheEvent.Type.CHILD_UPDATED;
-                        saveTime[0] = System.currentTimeMillis();
-                        logger.info("child[path={}, date={}] updated", event.getData().getPath(),
-                                new String(event.getData().getData()));
-                        break;
-                }
-            }
-        });
-
-        String hostPath = groupPath + "/localhost:8001";
-        zk.create().forPath(hostPath);
-        long wtStart = System.currentTimeMillis();
-        Thread.sleep(30);
-        // use 15 ms
-        // System.out.println("listener wait time="+(saveTime[0] - wtStart));
-        Assert.assertEquals(PathChildrenCacheEvent.Type.CHILD_ADDED, saveEventType[0]);
-        // System.out.println(new String(zk.getData().forPath(hostPath)));
-
-        // create three node
-        String threePath = groupPath + "/hosts/localhost:8001";
-        zk.create().creatingParentsIfNeeded().forPath(threePath);
-        zk.setData().forPath(threePath, "{tree}".getBytes());
-        // test update
-        zk.setData().forPath(hostPath, "{}".getBytes());
-        Thread.sleep(30);
-        Assert.assertEquals(PathChildrenCacheEvent.Type.CHILD_UPDATED, saveEventType[0]);
-
-        // test set parent node's data
-        zk.setData().forPath(groupPath, "{grou-data}".getBytes());
-        Thread.sleep(30);
-        Assert.assertEquals(PathChildrenCacheEvent.Type.CHILD_UPDATED, saveEventType[0]);
-    }
-
-    @Test
-    public void test_zkNode() throws Exception {
-        CuratorFramework zk = curator.usingNamespace("namespace-test");
-        String groupPath = "/group-1/localhost:9001";
-        String s = zk.create().creatingParentsIfNeeded().forPath(groupPath);
-        Assert.assertEquals(s, "/group-1/localhost:9001");
-        NodeCache nodeCache = new NodeCache(zk, "/group-1", true);
-        nodeCache.start();
-        nodeCache.getListenable().addListener(new NodeCacheListener() {
-
-            @Override
-            public void nodeChanged() throws Exception {
-                logger.info("node cache change");
-            }
-        });
-        zk.setData().forPath("/group-1", "test-0".getBytes());
-        zk.setData().forPath("/group-1", "test-2".getBytes());
-    }
-
-    @Test
-    public void test_use_2_times_namespace() throws Exception {
-        CuratorFramework zk = curator.usingNamespace("namespace-test").usingNamespace("ns2-test");
-        String serverPath = "/server";
-        zk.create().forPath(serverPath);
-        Assert.assertNotNull(zk.checkExists().forPath(serverPath));
-        Stat exists = zk.getZookeeperClient().getZooKeeper().exists("/ns2-test" + serverPath, false);
-        Assert.assertNotNull(exists);
-    }
-
 
     @Test
     public void test_tree_cache() throws Exception {
-        String rootPath = "/namespace-test";
-        CuratorFramework zk = curator.usingNamespace("namespace-test");
-        String groupPath = "/group-1";
-        String s = zk.create().forPath(groupPath);
-        Assert.assertEquals(groupPath, s);
-        Stat stat = zk.checkExists().forPath("/group-1");
-        Assert.assertNotNull(stat);
-        stat = zk.checkExists().forPath(rootPath);
-        Assert.assertNull(stat);
+
 
         final TreeCacheEvent.Type[] saveEventType = new TreeCacheEvent.Type[1];
         final long[] saveTime = new long[1];
-        TreeCache treeCache = new TreeCache(curator, rootPath);
+        TreeCache treeCache = new TreeCache(client, joinNodePath(namespace));
         treeCache.start();
         treeCache.getListenable().addListener(new TreeCacheListener() {
 
@@ -244,7 +130,7 @@ public class CuratorTest {
             }
         });
         String hostPath = groupPath + "/localhost:8001";
-        zk.create().forPath(hostPath);
+        client.create().forPath(hostPath);
         long wtStart = System.currentTimeMillis();
         Thread.sleep(300);
         // use 15 ms
@@ -254,15 +140,15 @@ public class CuratorTest {
 
         // create three node
         String threePath = groupPath + "/hosts/localhost:8001";
-        zk.create().creatingParentsIfNeeded().forPath(threePath);
-        zk.setData().forPath(threePath, "{tree}".getBytes());
+        client.create().creatingParentsIfNeeded().forPath(threePath);
+        client.setData().forPath(threePath, "{tree}".getBytes());
         // test update
-        zk.setData().forPath(hostPath, "{}".getBytes());
+        client.setData().forPath(hostPath, "{}".getBytes());
         Thread.sleep(300);
         Assert.assertEquals(TreeCacheEvent.Type.NODE_UPDATED, saveEventType[0]);
 
         // test set parent node's data
-        zk.setData().forPath("/group-1", "{grou-data}".getBytes());
+        client.setData().forPath("/group-1", "{grou-data}".getBytes());
         Thread.sleep(300);
         Assert.assertEquals(TreeCacheEvent.Type.NODE_UPDATED, saveEventType[0]);
         while (true) {
