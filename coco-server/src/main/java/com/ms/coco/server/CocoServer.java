@@ -14,7 +14,6 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
-import com.ms.coco.CocoRestServer;
 import com.ms.coco.common.ThreadPoolInfo;
 import com.ms.coco.exception.RpcServiceException;
 import com.ms.coco.registry.ServiceRegistry;
@@ -84,7 +83,6 @@ public class CocoServer implements ApplicationContextAware, InitializingBean {
             if (restfulServer == null) {
                 throw new RuntimeException("restful server bean not be set ,please check it ");
             }
-            restfulServer.init();
         }
 
     }
@@ -195,16 +193,16 @@ public class CocoServer implements ApplicationContextAware, InitializingBean {
         this.useRestFul = useRestFul;
     }
 
-    public void setRestfulServer(CocoRestServer restfulServer) {
-        this.restfulServer = restfulServer;
-    }
-
     public void setRpcPort(Integer rpcPort) {
         this.rpcPort = rpcPort;
     }
 
     public void setLocalIp(String localIp) {
         this.localIp = localIp;
+    }
+
+    public void setRestfulServer(CocoRestServer restfulServer) {
+        this.restfulServer = restfulServer;
     }
 
 }

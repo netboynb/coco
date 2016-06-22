@@ -1,10 +1,9 @@
 package com.ms.coco.rest.server;
 
-import com.ms.coco.CocoRestServer;
-import com.ms.coco.common.CocoMessageObserver;
-import com.ms.coco.common.LastModifiedHeaderPostprocessor;
-import com.ms.coco.conf.DefaultCocoConf;
-import com.ms.coco.echo.DemoCocoRoute;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import com.ms.coco.server.CocoRestServer;
 
 /**
  * @author wanglin/netboy
@@ -14,13 +13,9 @@ import com.ms.coco.echo.DemoCocoRoute;
 public class CocoRestfulServerDemo {
 
     public static void main(String[] args) {
+        ApplicationContext ac = new ClassPathXmlApplicationContext("spring-single-restful.xml");
         CocoRestServer server = new CocoRestServer();
-        server.setCocoConf(new DefaultCocoConf());
-        server.setCocoRoute(new DemoCocoRoute());
-        server.setMessageObserver(new CocoMessageObserver());
-        server.setPostprocessor(new LastModifiedHeaderPostprocessor());
-        server.setPort(8089);
-        server.init();
+        server.setPort(8082).setRootResourcePath("/rest").setAc(ac);
         server.start();
     }
 

@@ -1,5 +1,6 @@
-package com.ms.coco.rpc.server;
+package com.ms.coco.rest.controller;
 
+import java.util.List;
 import java.util.concurrent.TimeoutException;
 
 import com.ms.coco.sample.api.HelloService;
@@ -40,6 +41,11 @@ public class HelloServiceImpl2 implements HelloService {
     @Override
     public Integer parseIntStr() {
         return Integer.parseInt("ll");
+    }
+
+    @Override
+    public List<Person> fetchList(Integer num) {
+        return null;
     }
 
 }
