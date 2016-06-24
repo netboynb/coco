@@ -1,4 +1,4 @@
-package com.ms.coco.controller;
+package com.ms.coco.rest.controller;
 
 import java.util.List;
 
@@ -17,9 +17,9 @@ import javax.ws.rs.core.SecurityContext;
 
 import org.springframework.stereotype.Controller;
 
-import com.ms.coco.bean.Article;
-import com.ms.coco.bean.Helloworld;
-import com.ms.coco.bean.Person;
+import com.ms.coco.rest.bean.Article;
+import com.ms.coco.rest.bean.Helloworld;
+import com.ms.coco.rest.bean.Person;
 
 @Controller
 @Path("/hello")

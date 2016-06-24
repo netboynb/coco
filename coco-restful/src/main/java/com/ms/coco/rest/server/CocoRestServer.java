@@ -1,4 +1,4 @@
-package com.ms.coco.server;
+package com.ms.coco.rest.server;
 
 import java.util.Collection;
 
@@ -7,6 +7,8 @@ import javax.ws.rs.ext.Provider;
 
 import org.jboss.resteasy.plugins.server.netty.NettyJaxrsServer;
 import org.jboss.resteasy.spi.ResteasyDeployment;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
@@ -15,7 +17,7 @@ import org.springframework.util.Assert;
 
 @Component
 public class CocoRestServer {
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(CocoRestServer.class);
 	@Autowired
 	ApplicationContext				ac;
 
@@ -50,6 +52,7 @@ public class CocoRestServer {
         netty.setRootResourcePath(rootResourcePath);
 		netty.setSecurityDomain(null);
 		netty.start();
+        LOGGER.info("rest-netty-server started , port {}", port);
 	}
 
 	@PreDestroy

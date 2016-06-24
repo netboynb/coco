@@ -1,4 +1,4 @@
-package com.ms.coco.bean;
+package com.ms.coco.rest.bean;
 
 public class Article {
 

@@ -1,11 +1,11 @@
-package com.ms.coco.demo;
+package com.ms.coco.rest.demo;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.util.Assert;
 
-import com.ms.coco.controller.HomeController;
-import com.ms.coco.server.CocoRestServer;
+import com.ms.coco.rest.controller.HomeController;
+import com.ms.coco.rest.server.CocoRestServer;
 
 public class Main {
 

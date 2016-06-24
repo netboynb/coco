@@ -1,4 +1,4 @@
-package com.ms.coco.server;
+package com.ms.coco.rest.server;
 
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
