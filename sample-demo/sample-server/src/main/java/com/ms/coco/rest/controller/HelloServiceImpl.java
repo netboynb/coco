@@ -68,11 +68,17 @@ public class HelloServiceImpl implements HelloService {
         return Integer.parseInt(str);
     }
 
+    @GET
+    @Path("/parseIntStr")
+    @Produces("application/json")
     @Override
     public Integer parseIntStr() {
         return Integer.parseInt("ll");
     }
 
+    @POST
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     @Override
     public Person add(Person person) {
         person.setContent(content);

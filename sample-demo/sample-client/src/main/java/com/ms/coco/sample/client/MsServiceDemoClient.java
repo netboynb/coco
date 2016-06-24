@@ -47,7 +47,7 @@ public class MsServiceDemoClient {
     @Test
     public void testParseNot() {
         try {
-            helloService.parseIntStr();
+            helloService.parseIntStr("121");
         } catch (Exception e) {
             e.printStackTrace();
         }
