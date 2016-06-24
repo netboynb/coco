@@ -18,6 +18,12 @@
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-api</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<dependency>
@@ -61,6 +67,11 @@
 				<groupId>commons-lang</groupId>
 				<artifactId>commons-lang</artifactId>
 			</dependency>
+		<dependency>
+		    <groupId>org.jboss.spec.javax.ws.rs</groupId>
+		    <artifactId>jboss-jaxrs-api_2.0_spec</artifactId>
+		    <version>1.0.0.Final</version>
+		</dependency>
     </dependencies>
 
 </project>
