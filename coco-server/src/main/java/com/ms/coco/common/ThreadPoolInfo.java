@@ -9,10 +9,10 @@ import com.google.common.base.MoreObjects;
 */
 public class ThreadPoolInfo {
     String threadPoolName = "rpc-business-pool";
-    Integer poolMinSize;
-    Integer poolmaxSize = 20;
-    Integer poolQueueSize;
-    Long poolThreadAliveTimeInsecond;
+    Integer poolMinSize = Runtime.getRuntime().availableProcessors();
+    Integer poolmaxSize = Runtime.getRuntime().availableProcessors() * 2 + 2;
+    Integer poolQueueSize = 100;
+    Long poolThreadAliveTimeInsecond = 100L;
 
     public ThreadPoolInfo(String threadPoolName, Integer poolMinSize, Integer poolmaxSize, Integer poolQueueSize,
             Long poolThreadAliveTimeInsecond) {

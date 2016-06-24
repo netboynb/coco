@@ -3,7 +3,7 @@ package com.ms.coco.rest.server;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import com.ms.coco.server.CocoRestServer;
+import com.ms.coco.rest.server.CocoRestServer;
 
 /**
  * @author wanglin/netboy

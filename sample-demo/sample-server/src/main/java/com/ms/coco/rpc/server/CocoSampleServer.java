@@ -21,6 +21,6 @@ public class CocoSampleServer {
         zkServer.start();
         LOGGER.debug("start server");
         System.out.println("start rpc sample server");
-        new ClassPathXmlApplicationContext("spring.xml");
+        new ClassPathXmlApplicationContext("spring-rpc-rest.xml");
     }
 }

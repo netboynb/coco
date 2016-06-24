@@ -11,12 +11,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.stereotype.Component;
 
 import com.ms.coco.common.ThreadPoolInfo;
 import com.ms.coco.exception.RpcServiceException;
 import com.ms.coco.registry.ServiceRegistry;
+import com.ms.coco.rest.server.CocoRestServer;
 import com.ms.coco.server.handler.RpcChannelInitializer;
 import com.ms.coco.server.service.RpcService;
 import com.ms.coco.util.StringUtil;
@@ -35,18 +38,21 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
  * @author wanglin/netboy
  * @since 1.0.0
  */
+@Component
 public class CocoServer implements ApplicationContextAware, InitializingBean {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CocoServer.class);
+    @Autowired
+    private CocoRestServer restfulServer;
+    @Autowired
+    private ServiceRegistry serviceRegistry;
 
     private Integer rpcPort = 8089;
     private String localIp;
     private int ioWorkerNum = Runtime.getRuntime().availableProcessors() * 2;
-    private ServiceRegistry serviceRegistry;
     private ThreadPoolInfo threadPoolInfo = new ThreadPoolInfo();
     private boolean useRpc = true;
     private boolean useRestFul = true;
-    private CocoRestServer restfulServer;
 
     /**
      * 存放 服务名 与 服务对象 之间的映射关系
