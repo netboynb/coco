@@ -38,6 +38,7 @@ public class SingleThreadStrTest {
         long time = System.currentTimeMillis() - start;
         System.out.println("loop: " + loopCount);
         System.out.println("time: " + time + "ms");
+        System.out.println("rt: " + (double) time / loopCount);
         System.out.println("tps: " + (double) loopCount / ((double) time / 1000));
 
         System.exit(0);
