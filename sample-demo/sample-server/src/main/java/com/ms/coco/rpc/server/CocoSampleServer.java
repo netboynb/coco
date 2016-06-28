@@ -17,7 +17,7 @@ public class CocoSampleServer {
 
     public static void main(String[] args) throws Exception {
         System.out.println("start ms test zookeeper");
-        TestingServer zkServer = new TestingServer(2182);
+        TestingServer zkServer = new TestingServer(2181);
         zkServer.start();
         LOGGER.debug("start server");
         System.out.println("start rpc sample server");

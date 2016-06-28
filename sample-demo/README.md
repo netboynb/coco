@@ -11,7 +11,8 @@ just run
 
 sample-server's
 
-com.ms.coco.rpc.server.CocoSampleServer.main(String[])
+com.ms.coco.rpc.server.CocoSampleServer
+
 ```
   you must make sure the "spring.xml" file's "cocoServer" bean's is
 
@@ -53,14 +54,15 @@ sample-server 's
 com.ms.coco.rest.server.CocoRestfulServerDemo
 ```
 
-2  use get post put delete to test
+2  use url test
 
 ```
-get      localhost:8089/success/0.json?echo=i+am+an+message
-post     localhost:8089/success/0.json?echo=i+am+an+message
-put      localhost:8089/success/0.json?echo=i+am+an+message
-delete   localhost:8089/success/0.json?echo=i+am+an+message
+
+http://localhost:8082/rest/hello/v1/echo?name=netboy
+http://localhost:8082/rest/hello/v1/int?key=223
+
 ```
+more url test  ,please see class "com.ms.coco.rest.controller.HelloServiceImpl"
 
 ###  test rpc client example
 
