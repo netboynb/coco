@@ -23,8 +23,8 @@ public class CocoRestServer {
 
     private String rootResourcePath = "/resteasy";
     private int port = 8082;
-    private int ioWorkerCount = Runtime.getRuntime().availableProcessors() * 2;
-    private int executorThreadCount = 16;
+    private int ioWorkerCount = Runtime.getRuntime().availableProcessors() * 2 + 2;
+    private int executorThreadCount = 4;
 
     private NettyJaxrsServer netty;
 

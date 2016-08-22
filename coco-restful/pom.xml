@@ -15,6 +15,7 @@
     <artifactId>coco-restful</artifactId>
 
     <dependencies>
+
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
