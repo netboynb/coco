@@ -60,7 +60,9 @@
 	```
 	meaning just start server with restful model ,no Rpc model
 
+###  分布式 框架设计图 
 
+![image](https://github.com/netboynb/coco/blob/master/coco-registry/distribute_framework.png)
 
 ### just only simple restful model
 
