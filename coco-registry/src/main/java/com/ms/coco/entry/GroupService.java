@@ -12,7 +12,7 @@ import com.ms.coco.model.ServerNode;
  */
 public interface GroupService {
 
-    Map<String, List<ServerNode>> getAllReaders();
+    Map<String, List<? extends ServerNode>> getAllReaders();
 
-    Map<String, List<ServerNode>> getAvailableReaders();
+    Map<String, List<? extends ServerNode>> getAvailableReaders();
 }

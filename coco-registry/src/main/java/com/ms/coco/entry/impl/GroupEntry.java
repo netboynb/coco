@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap.Builder;
+import com.google.common.collect.Maps;
 import com.ms.coco.common.CocoEnum;
 import com.ms.coco.common.CocoUtils;
 import com.ms.coco.common.NodeEnum;
@@ -18,7 +19,6 @@ import com.ms.coco.entry.NotifyService;
 import com.ms.coco.model.LeafGroup;
 import com.ms.coco.model.Node;
 import com.ms.coco.model.ServerNode;
-import com.google.common.collect.Maps;
 
 /**
 * @author wanglin/netboy
@@ -28,16 +28,16 @@ import com.google.common.collect.Maps;
 public class GroupEntry implements GroupService, NotifyService {
     private static final Logger LOGGER = LoggerFactory.getLogger(GroupEntry.class);
     private Map<String, ChildGroupEntry> groupsMap = Maps.newConcurrentMap();
-    private ImmutableMap<String, List<ServerNode>> allReaderImmuableMap = null;
-    private ImmutableMap<String, List<ServerNode>> availableReaderImmuableMap = null;
+    private ImmutableMap<String, List<? extends ServerNode>> allReaderImmuableMap = null;
+    private ImmutableMap<String, List<? extends ServerNode>> availableReaderImmuableMap = null;
 
     @Override
-    public Map<String, List<ServerNode>> getAllReaders() {
+    public Map<String, List<? extends ServerNode>> getAllReaders() {
         return allReaderImmuableMap;
     }
 
     @Override
-    public Map<String, List<ServerNode>> getAvailableReaders() {
+    public Map<String, List<? extends ServerNode>> getAvailableReaders() {
         return availableReaderImmuableMap;
     }
 
@@ -118,8 +118,8 @@ public class GroupEntry implements GroupService, NotifyService {
 
     @Override
     public void refresh() {
-        Builder allBuilder = ImmutableMap.builder();
-        Builder availableBuilder = ImmutableMap.builder();
+        Builder<String, List<? extends ServerNode>> allBuilder = ImmutableMap.builder();
+        Builder<String, List<? extends ServerNode>> availableBuilder = ImmutableMap.builder();
         for(Entry<String, ChildGroupEntry> entry: groupsMap.entrySet()){
             allBuilder.put(entry.getKey(), entry.getValue().getAllReaders());
             availableBuilder.put(entry.getKey(), entry.getValue().getAvailableReaders());

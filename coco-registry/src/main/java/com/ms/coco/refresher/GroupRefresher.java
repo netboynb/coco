@@ -25,7 +25,7 @@ public class GroupRefresher extends Refresher {
 
     @Override
     public String rootPath() {
-        return CocoUtils.buildPath(nameSpace, NodeEnum.GROUP_NODE.toString());
+        return CocoUtils.buildPath(nameSpace, NodeEnum.GROUP_NODE.value());
     }
 
     @Override

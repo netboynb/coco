@@ -92,13 +92,13 @@ public abstract class Refresher implements TreeCacheListener {
     }
 
     protected void logNodeChanged(CuratorFramework curator, TreeCacheEvent event) {
-        logger.info("[{}] {} event={} path={}", curator.getNamespace(), rootPath(), event.getType(), event.getData().getPath());
+        logger.info("[{}] {} info={}", curator.getNamespace(), rootPath(), event.toString());
     }
 
     @Override
     public void childEvent(CuratorFramework client, TreeCacheEvent event) {
         if (logger.isDebugEnabled()) {
-            logger.debug("path={} event={}", event.getData().getPath(), event.getType());
+            logger.debug("childEvent info={}", event.toString());
         }
         switch (event.getType()) {
             case NODE_ADDED:

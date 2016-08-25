@@ -25,7 +25,7 @@ public class ProxyRefresher extends Refresher {
 
     @Override
     public String rootPath() {
-        return CocoUtils.buildPath(nameSpace, NodeEnum.PROXY_NODE.toString());
+        return CocoUtils.buildPath(nameSpace, NodeEnum.PROXY_NODE.value());
     }
 
     @Override

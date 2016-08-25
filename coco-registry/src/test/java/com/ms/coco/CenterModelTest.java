@@ -10,6 +10,7 @@ import org.junit.Test;
 import com.ms.coco.common.RegisterHolder;
 import com.ms.coco.model.ServerNode;
 import com.ms.coco.model.ServiceConf;
+import com.ms.coco.utils.RegisterClient;
 
 /**
 * @author wanglin/netboy
@@ -39,10 +40,10 @@ public class CenterModelTest {
                 .setRegisterUrl(zkUrl).setServerNode(serverNode);
         CenterModel centerModel = new CenterModel(serviceConf.getServiceName(), serviceConf.getRegisterUrl());
         try {
-
             centerModel.init();
             centerModel.start();
-
+            Thread.sleep(5000);
+            RegisterClient.registerService(serviceConf);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -52,8 +53,6 @@ public class CenterModelTest {
                 e.printStackTrace();
             }
         }
-
-
     }
 
 }

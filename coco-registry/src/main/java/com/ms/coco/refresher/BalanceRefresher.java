@@ -25,7 +25,7 @@ public class BalanceRefresher extends Refresher {
 
     @Override
     public String rootPath() {
-        return CocoUtils.buildPath(nameSpace, NodeEnum.BALANCE_NODE.toString());
+        return CocoUtils.buildPath(nameSpace, NodeEnum.BALANCE_NODE.value());
     }
 
     @Override

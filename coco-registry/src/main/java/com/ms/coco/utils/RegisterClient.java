@@ -38,7 +38,6 @@ public class RegisterClient {
         LOGGER.info("end to [registe] to path [{}]", serverPath);
         // start to ping heart center
         startHeartClient(serviceConf);
-
     }
 
     /**
