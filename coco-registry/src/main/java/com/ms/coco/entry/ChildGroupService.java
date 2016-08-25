@@ -10,9 +10,9 @@ import com.ms.coco.model.ServerNode;
  * @func
  */
 public interface ChildGroupService {
-    List<? extends ServerNode> getAllReaders();
+    List<ServerNode> getAllReaders();
 
-    List<? extends ServerNode> getAvailableReaders();
+    List<ServerNode> getAvailableReaders();
 
     boolean groupStatus();
 }

@@ -159,6 +159,8 @@ public class ProxyEntry implements ProxyService, NotifyService {
     }
 
     @Override
-    public void refresh() {}
+    public void refresh() {
+        LOGGER.info("proxyEntry refresh ,nothing to do ");
+    }
 
 }

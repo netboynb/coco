@@ -2,18 +2,23 @@ package com.ms.coco;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.curator.framework.CuratorFramework;
 
 import com.google.common.collect.Lists;
+import com.ms.coco.balance.BaseBalance;
 import com.ms.coco.common.CocoUtils;
 import com.ms.coco.common.NodeEnum;
 import com.ms.coco.common.RegisterHolder;
 import com.ms.coco.entry.impl.BalanceEntry;
 import com.ms.coco.entry.impl.GroupEntry;
 import com.ms.coco.entry.impl.ProxyEntry;
+import com.ms.coco.model.GroupProxy;
+import com.ms.coco.model.IpProxy;
+import com.ms.coco.model.ServerNode;
 import com.ms.coco.refresher.BalanceRefresher;
 import com.ms.coco.refresher.GroupRefresher;
 import com.ms.coco.refresher.ProxyRefresher;
@@ -31,7 +36,9 @@ public class CenterModel implements CenterService {
     private String registerUrl;
     private Integer min = 8;
     private Integer max = 20;
-
+    private GroupEntry groupEntry;
+    private BalanceEntry balanceEntry;
+    private ProxyEntry proxyEntry;
 
     public CenterModel(String namespace, String registerUrl) {
         this.namespace = namespace;
@@ -47,13 +54,16 @@ public class CenterModel implements CenterService {
             CuratorFramework client = RegisterHolder.getClient(registerUrl.trim());
             // create parent node first ,then create
             ExecutorService executorService = ThreadPoolHolder.getFixedPool("center-refresher", min, max);
-            Refresher groupRefresher = new GroupRefresher(namespace, client, executorService, new GroupEntry());
-            Refresher balanceRefresher = new BalanceRefresher(namespace, client, executorService, new BalanceEntry());
-            Refresher proxyRefresher = new ProxyRefresher(namespace, client, executorService, new ProxyEntry());
+            groupEntry = new GroupEntry();
+            balanceEntry = new BalanceEntry();
+            proxyEntry = new ProxyEntry();
+
+            Refresher groupRefresher = new GroupRefresher(namespace, client, executorService, groupEntry);
+            Refresher balanceRefresher = new BalanceRefresher(namespace, client, executorService, balanceEntry);
+            Refresher proxyRefresher = new ProxyRefresher(namespace, client, executorService, proxyEntry);
             refresherList.add(groupRefresher);
             refresherList.add(balanceRefresher);
             refresherList.add(proxyRefresher);
-
         }
     }
 
@@ -73,12 +83,8 @@ public class CenterModel implements CenterService {
 
     /**
      * 
-     * TODO: before start ,we will create 
-     * /namespace/service_node 
-     * /namespace/group_node
-     * /namespace/proxy_node 
-     * /namespace/balance_node 
-     * /namespace/client_node
+     * TODO: before start ,we will create /namespace/service_node /namespace/group_node
+     * /namespace/proxy_node /namespace/balance_node /namespace/client_node
      *
      */
     private void createParentPath() {
@@ -100,5 +106,35 @@ public class CenterModel implements CenterService {
 
     public void setRegisterUrl(String registerUrl) {
         this.registerUrl = registerUrl;
+    }
+
+    @Override
+    public Map<String, List<ServerNode>> getAllReaders() {
+        return groupEntry.getAllReaders();
+    }
+
+    @Override
+    public Map<String, List<ServerNode>> getAvailableReaders() {
+        return groupEntry.getAvailableReaders();
+    }
+
+    @Override
+    public BaseBalance getBalance() {
+        return balanceEntry.getBalance();
+    }
+
+    @Override
+    public List<GroupProxy> getGroupProxy() {
+        return proxyEntry.getGroupProxy();
+    }
+
+    @Override
+    public List<IpProxy> getIpProxy() {
+        return proxyEntry.getIpProxy();
+    }
+
+    @Override
+    public boolean proxyStatus() {
+        return proxyEntry.proxyStatus();
     }
 }

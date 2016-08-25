@@ -98,13 +98,13 @@ public class ChildGroupEntry implements ChildGroupService, NotifyService {
     }
 
     @Override
-    public List<? extends ServerNode> getAllReaders() {
+    public List<ServerNode> getAllReaders() {
         // return all server node
         return ImmutableList.copyOf(serverMaps.values());
     }
 
     @Override
-    public List<? extends ServerNode> getAvailableReaders() {
+    public List<ServerNode> getAvailableReaders() {
         // just return the available server node's immutable list
         return immutableList;
     }

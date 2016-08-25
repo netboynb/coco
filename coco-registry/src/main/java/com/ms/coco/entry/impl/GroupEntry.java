@@ -28,16 +28,16 @@ import com.ms.coco.model.ServerNode;
 public class GroupEntry implements GroupService, NotifyService {
     private static final Logger LOGGER = LoggerFactory.getLogger(GroupEntry.class);
     private Map<String, ChildGroupEntry> groupsMap = Maps.newConcurrentMap();
-    private ImmutableMap<String, List<? extends ServerNode>> allReaderImmuableMap = null;
-    private ImmutableMap<String, List<? extends ServerNode>> availableReaderImmuableMap = null;
+    private ImmutableMap<String, List<ServerNode>> allReaderImmuableMap = null;
+    private ImmutableMap<String, List<ServerNode>> availableReaderImmuableMap = null;
 
     @Override
-    public Map<String, List<? extends ServerNode>> getAllReaders() {
+    public Map<String, List<ServerNode>> getAllReaders() {
         return allReaderImmuableMap;
     }
 
     @Override
-    public Map<String, List<? extends ServerNode>> getAvailableReaders() {
+    public Map<String, List<ServerNode>> getAvailableReaders() {
         return availableReaderImmuableMap;
     }
 
@@ -118,8 +118,8 @@ public class GroupEntry implements GroupService, NotifyService {
 
     @Override
     public void refresh() {
-        Builder<String, List<? extends ServerNode>> allBuilder = ImmutableMap.builder();
-        Builder<String, List<? extends ServerNode>> availableBuilder = ImmutableMap.builder();
+        Builder<String, List<ServerNode>> allBuilder = ImmutableMap.builder();
+        Builder<String, List<ServerNode>> availableBuilder = ImmutableMap.builder();
         for(Entry<String, ChildGroupEntry> entry: groupsMap.entrySet()){
             String key = entry.getKey();
             ChildGroupEntry childGroupEntry = entry.getValue();
