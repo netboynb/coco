@@ -44,6 +44,8 @@ public class CenterModel implements CenterService {
             throw new RuntimeException("namespace && registerUrl can't be null,please check them");
         } else {
             CuratorFramework client = RegisterHolder.getClient(registerUrl.trim());
+            // create parent node first ,then create
+            createParentPath();
             ExecutorService executorService = ThreadPoolHolder.getFixedPool("center-refresher", min, max);
             Refresher groupRefresher = new GroupRefresher(namespace, client, executorService, new GroupEntry());
             Refresher balanceRefresher = new BalanceRefresher(namespace, client, executorService, new BalanceEntry());
@@ -57,7 +59,6 @@ public class CenterModel implements CenterService {
 
     @Override
     public void start() throws Exception {
-        createParentPath();
         for (Refresher refresher : refresherList) {
             refresher.start();
         }
