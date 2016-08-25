@@ -53,14 +53,14 @@ public class GroupEntry implements GroupService, NotifyService {
             return;
         } else if (!leafGroup.isLeaf()) {
             // the group node
-            ChildGroupEntry newChildGroupEntry = new ChildGroupEntry();
+            ChildGroupEntry newChildGroupEntry = new ChildGroupEntry(this);
             ChildGroupEntry childGroupEntry = groupsMap.putIfAbsent(leafGroup.getGroupname(), newChildGroupEntry);
             childGroupEntry = childGroupEntry == null ? newChildGroupEntry : childGroupEntry;
             // just set group name ,the group's status just keep default
             childGroupEntry.setGroupName(leafGroup.getGroupname());
         } else {
             // the group's leaf node
-            ChildGroupEntry newChildGroupEntry = new ChildGroupEntry();
+            ChildGroupEntry newChildGroupEntry = new ChildGroupEntry(this);
             ChildGroupEntry childGroupEntry = groupsMap.putIfAbsent(leafGroup.getGroupname(), newChildGroupEntry);
             childGroupEntry = childGroupEntry == null ? newChildGroupEntry : childGroupEntry;
             childGroupEntry.addEvent(node);
@@ -80,14 +80,14 @@ public class GroupEntry implements GroupService, NotifyService {
             return;
         } else if (!leafGroup.isLeaf()) {
             // the group node
-            ChildGroupEntry newChildGroupEntry = new ChildGroupEntry();
+            ChildGroupEntry newChildGroupEntry = new ChildGroupEntry(this);
             ChildGroupEntry childGroupEntry = groupsMap.putIfAbsent(leafGroup.getGroupname(), newChildGroupEntry);
             childGroupEntry = childGroupEntry == null ? newChildGroupEntry : childGroupEntry;
             // just update group status
             childGroupEntry.setOpened(parseGroupStatus(node));
         } else {
             // the group's leaf node
-            ChildGroupEntry newChildGroupEntry = new ChildGroupEntry();
+            ChildGroupEntry newChildGroupEntry = new ChildGroupEntry(this);
             ChildGroupEntry childGroupEntry = groupsMap.putIfAbsent(leafGroup.getGroupname(), newChildGroupEntry);
             childGroupEntry = childGroupEntry == null ? newChildGroupEntry : childGroupEntry;
             childGroupEntry.addEvent(node);
@@ -121,8 +121,11 @@ public class GroupEntry implements GroupService, NotifyService {
         Builder<String, List<? extends ServerNode>> allBuilder = ImmutableMap.builder();
         Builder<String, List<? extends ServerNode>> availableBuilder = ImmutableMap.builder();
         for(Entry<String, ChildGroupEntry> entry: groupsMap.entrySet()){
-            allBuilder.put(entry.getKey(), entry.getValue().getAllReaders());
-            availableBuilder.put(entry.getKey(), entry.getValue().getAvailableReaders());
+            String key = entry.getKey();
+            ChildGroupEntry childGroupEntry = entry.getValue();
+            childGroupEntry.selfRefresh();
+            allBuilder.put(key, childGroupEntry.getAllReaders());
+            availableBuilder.put(key, childGroupEntry.getAvailableReaders());
         }
        allReaderImmuableMap = allBuilder.build();
        availableReaderImmuableMap = availableBuilder.build();

@@ -28,6 +28,12 @@ public class ChildGroupEntry implements ChildGroupService, NotifyService {
     private String groupName;
     private Map<String, ServerNode> serverMaps = Maps.newHashMap();
     private ImmutableList<ServerNode> immutableList = null;
+    private GroupEntry parentGroupEntry;
+
+    public ChildGroupEntry(GroupEntry parentGroupEntry) {
+        super();
+        this.parentGroupEntry = parentGroupEntry;
+    }
 
     @Override
     public void addEvent(Node node) {
@@ -115,18 +121,20 @@ public class ChildGroupEntry implements ChildGroupService, NotifyService {
      */
     @Override
     public void refresh() {
+        parentGroupEntry.refresh();
+    }
+
+    // groupEntry's refresh call the method
+    public void selfRefresh() {
+        List<ServerNode> list = Lists.newArrayList();
         if (isOpened) {
-            List<ServerNode> list = Lists.newArrayList();
             serverMaps.values().parallelStream().forEach(item -> {
                 if (item.serviceAvailable()) {
                     list.add(item);
                 }
             });
-            immutableList = ImmutableList.copyOf(list);
-        } else {
-            // if group's status is false,return null
-            immutableList = null;
         }
+        immutableList = ImmutableList.copyOf(list);
     }
 
     public void setGroupName(String groupName) {

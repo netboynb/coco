@@ -38,7 +38,7 @@ public class BalanceEntry implements BalanceService, NotifyService {
     public void addEvent(Node node) {
         String data = node.getData();
         BaseBalance newBalance = balance;
-        if (!StringUtils.isBlank(data)) {
+        if (!StringUtils.isBlank(data) && !data.equals("{}")) {
             String balanceName = data.trim();
             newBalance = instanceMap.get(balanceName);
             if (null == newBalance) {
@@ -54,7 +54,6 @@ public class BalanceEntry implements BalanceService, NotifyService {
             } else {
                 balance = newBalance;
             }
-
         }
     }
 
