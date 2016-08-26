@@ -4,7 +4,7 @@ import org.I0Itec.zkclient.ZkClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.ms.coco.registry.ServiceRegistry;
+import com.ms.coco.registry.inteface.ServiceRegistry;
 
 /**
  * 基于 ZooKeeper 的服务注册接口实现

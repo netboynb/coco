@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import com.ms.coco.exception.RpcErrorMsgConstant;
 import com.ms.coco.exception.RpcFrameworkException;
-import com.ms.coco.registry.ServiceDiscovery;
+import com.ms.coco.registry.inteface.ServiceDiscovery;
 import com.ms.coco.util.CollectionUtil;
 
 /**

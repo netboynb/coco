@@ -15,7 +15,7 @@ import com.ms.coco.exception.RpcBizException;
 import com.ms.coco.exception.RpcFrameworkException;
 import com.ms.coco.exception.RpcServiceException;
 import com.ms.coco.netty.client.RpcNettyClient;
-import com.ms.coco.registry.ServiceDiscovery;
+import com.ms.coco.registry.inteface.ServiceDiscovery;
 import com.ms.coco.util.StringUtil;
 
 /**

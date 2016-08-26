@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 
 import com.ms.coco.common.ThreadPoolInfo;
 import com.ms.coco.exception.RpcServiceException;
-import com.ms.coco.registry.ServiceRegistry;
+import com.ms.coco.registry.inteface.ServiceRegistry;
 import com.ms.coco.rest.server.CocoRestServer;
 import com.ms.coco.server.handler.RpcChannelInitializer;
 import com.ms.coco.server.service.RpcService;

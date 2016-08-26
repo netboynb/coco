@@ -13,6 +13,7 @@
 
 # Maven
 log/
+logs/*
 target/
 soa-print-mem*
 soa-flush-mem*
