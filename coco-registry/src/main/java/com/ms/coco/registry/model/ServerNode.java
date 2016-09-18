@@ -1,6 +1,9 @@
 package com.ms.coco.registry.model;
 
 import com.google.common.base.Objects;
+import com.google.gson.FieldNamingPolicy;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.ms.coco.registry.common.CocoUtils;
 
 /**
@@ -8,8 +11,10 @@ import com.ms.coco.registry.common.CocoUtils;
  * @version 创建时间：2016年8月11日 下午11:02:17
  * @func
  */
-public class ServerNode {
-
+public class ServerNode extends JsonNode {
+    private static final Gson nodeValueGson =
+            new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+                    .setExclusionStrategies(new FileNameExclusionStrategy("key")).create();
     public enum ServerStatus {
         Invalid, Unready, Available, Dead
     }
@@ -116,5 +121,10 @@ public class ServerNode {
 
     public static ServerNode jsonToNode(String json) {
         return CocoUtils.GSON.fromJson(json, ServerNode.class);
+    }
+
+    @Override
+    protected Gson nodeValueGson() {
+        return nodeValueGson;
     }
 }

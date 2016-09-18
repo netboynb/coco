@@ -7,8 +7,10 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 
 import org.apache.curator.framework.CuratorFramework;
+import org.apache.curator.utils.ZKPaths;
 import org.apache.zookeeper.data.Stat;
 
+import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
@@ -19,6 +21,7 @@ import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.ms.coco.registry.model.FileNameExclusionStrategy;
+import com.ms.coco.registry.model.ServerNode;
 
 /**
  * @author wanglin/netboy
@@ -29,11 +32,13 @@ public class CocoUtils {
     public static final Gson GSON =
             new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
                     .setExclusionStrategies(new FileNameExclusionStrategy("key")).create();
+
     /**
      * 创建定时执行的线程池
      */
     public static ScheduledExecutorService createScheduledPool(int corePoolSize, String threadName, boolean isDaemon) {
-        ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat(threadName + "-%d").setDaemon(isDaemon).build();
+        ThreadFactory threadFactory =
+                new ThreadFactoryBuilder().setNameFormat(threadName + "-%d").setDaemon(isDaemon).build();
         return Executors.newScheduledThreadPool(corePoolSize, threadFactory);
     }
 
@@ -41,10 +46,11 @@ public class CocoUtils {
      * 创建指定线程数目的线程池
      */
     public static ExecutorService createFixedPool(int corePoolSize, String threadName, boolean isDaemon) {
-        ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat(threadName + "-%d").setDaemon(isDaemon).build();
+        ThreadFactory threadFactory =
+                new ThreadFactoryBuilder().setNameFormat(threadName + "-%d").setDaemon(isDaemon).build();
         return Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), threadFactory);
     }
-    
+
 
     public static String buildPath(String... pathName) {
         List<String> list = Lists.newArrayList(pathName);
@@ -123,6 +129,35 @@ public class CocoUtils {
         Stat stat = curator.checkExists().forPath(path);
         if (stat != null) {
             curator.delete().forPath(path);
+        }
+    }
+
+    public static Object getPathaData(CuratorFramework curatorFramework, String path) throws Exception {
+        Preconditions.checkNotNull(curatorFramework, " curatorFramework can not be null");
+        Preconditions.checkNotNull(path, "path can not be null");
+        Object object = null;
+        if (!checkNode(curatorFramework, path)) {
+            return null;
+        }
+        byte[] dataByte = curatorFramework.getData().forPath(path);
+        object = new String(dataByte, Charsets.UTF_8);
+        return object;
+    }
+
+    public static void removePath(CuratorFramework curator, String path) throws Exception {
+        if (!checkNode(curator, path)) {
+            return;
+        }
+        curator.delete().forPath(path);
+    }
+
+    public static void createOrUpdateServerNode(CuratorFramework curator, ServerNode serverNode, String parentPath)
+            throws Exception {
+        String path = ZKPaths.makePath(parentPath, String.valueOf(serverNode.hostKey()));
+        if (curator.checkExists().forPath(path) == null) {
+            curator.create().creatingParentsIfNeeded().forPath(path, serverNode.toNodeJsonBinary());
+        } else {
+            curator.setData().forPath(path, serverNode.toNodeJsonBinary());
         }
     }
 }
