@@ -36,6 +36,7 @@
 		<restExpress.version>0.11.3</restExpress.version>
 		<resteasy.version>3.0.17.Final</resteasy.version>
 		<httpclient.version>4.5.1</httpclient.version>
+        <CocoUtils.version>0.0.1-SNAPSHOT</CocoUtils.version>
     </properties>
 
     <modules>
@@ -51,6 +52,11 @@
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+              <groupId>com.coco.utils</groupId>
+              <artifactId>CocoUtils</artifactId>
+              <version>${CocoUtils.version}</version>
+            </dependency>
 			<dependency>
 				<groupId>com.google.code.gson</groupId>
 				<artifactId>gson</artifactId>

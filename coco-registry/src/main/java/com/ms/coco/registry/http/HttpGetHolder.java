@@ -9,7 +9,10 @@ import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.coco.utils.Consts;
+import com.coco.utils.web.Proto;
 import com.google.common.collect.Maps;
+import com.google.gson.Gson;
 import com.ms.coco.registry.model.ServiceConf;
 
 /**
@@ -22,6 +25,8 @@ public class HttpGetHolder {
     private volatile static Map<String, HttpGet> httpMap;
     private volatile static HttpGetHolder httpGetHolder;
     private static ReentrantLock lock;
+
+    private static final Gson gson = new Gson();
 
     private HttpGetHolder() {}
 
@@ -46,16 +51,20 @@ public class HttpGetHolder {
                 }
                 String ip = array[0];
                 Integer port = Integer.valueOf(array[1]);
-                URIBuilder builder = new URIBuilder();
-                builder.setScheme("http").setHost(ip).setPort(port).setPath("/heart")
-                        .setParameter("zkurl", serviceConf.getRegisterUrl())
-                        .setParameter("serviceName", serviceConf.getServiceName())
-                        .setParameter("groupName", serviceConf.getGroupName())
-                        .setParameter("hostKey", serviceConf.getServerNode().hostKey());
+                Map<String, String> data = Maps.newHashMap();
+                data.put(Consts.zkurl, serviceConf.getRegisterUrl());
+                data.put(Consts.serviceName, serviceConf.getServiceName());
+                data.put(Consts.groupName, serviceConf.getGroupName());
+                data.put(Consts.hostKey, serviceConf.getServerNode().hostKey());
                 String livetime = serviceConf.getRedisKeyLiveTimeInMillisecond();
                 if (livetime != null) {
-                    builder.setParameter("liveTimeInMillisecond", livetime);
+                    data.put(Consts.liveTimeInMillisecond, livetime);
                 }
+
+                Proto proto = new Proto(0, null, data);
+                URIBuilder builder = new URIBuilder();
+                builder.setScheme("http").setHost(ip).setPort(port).setPath(Consts.heartPath)
+                        .setParameter(Consts.payload, gson.toJson(proto));
                 RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(3000)
                         .setConnectionRequestTimeout(1000).setSocketTimeout(1000).build();
                 HttpGet request = new HttpGet(builder.build());
