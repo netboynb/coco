@@ -132,11 +132,11 @@ public class RpcNettyClient implements Client {
 
     @Override
     public void setService(String serviceName) {
-
+        this.serviceName = serviceName;
     }
 
     @Override
     public void setIpKey(String key) {
-
+        this.ipPortKey = key;
     }
 }

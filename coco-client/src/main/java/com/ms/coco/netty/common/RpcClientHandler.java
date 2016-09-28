@@ -44,6 +44,7 @@ public class RpcClientHandler extends SimpleChannelInboundHandler<RpcResponse> {
 	protected final ResponsePromiseContainer responsePromiseContainer;
 
 	public RpcClientHandler(ResponsePromiseContainer responsePromiseContainer) {
+        super(true);
 		if (responsePromiseContainer == null) {
 			throw new IllegalArgumentException("ResponsePromise maps can't be null!");
 		}

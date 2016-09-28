@@ -26,6 +26,7 @@ import com.ms.coco.util.StringUtil;
 import com.ms.coco.util.ThreadPoolHolder;
 
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
@@ -112,6 +113,10 @@ public class CocoServer implements ApplicationContextAware, InitializingBean {
                         new RpcChannelInitializer(handlerMap, workerExecutorService).setThreadPoolInfo(threadPoolInfo));
                 bootstrap.option(ChannelOption.SO_BACKLOG, 1024);
                 bootstrap.childOption(ChannelOption.SO_KEEPALIVE, true);
+                bootstrap.option(ChannelOption.TCP_NODELAY, true);
+                // use ByteBuf pool
+                bootstrap.option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT);
+
                 localIp = getLocalHostIp();
                 ChannelFuture future = bootstrap.bind(localIp, rpcPort).sync();
                 LOGGER.info(" end start rpc-netty server ");

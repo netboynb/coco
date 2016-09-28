@@ -2,6 +2,7 @@ package com.ms.coco.server.handler;
 
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import com.ms.coco.bean.RpcRequest;
 import com.ms.coco.bean.RpcResponse;
@@ -14,6 +15,7 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.LengthFieldPrepender;
+import io.netty.handler.timeout.IdleStateHandler;
 
 /**
 * @author wanglin/netboy
@@ -44,7 +46,8 @@ public class RpcChannelInitializer extends ChannelInitializer<SocketChannel> {
         pipeline.addLast(new RpcEncoder(RpcResponse.class)); // 编码 RPC 响应
         // deal rpc request
         pipeline.addLast(new RpcServerHandler(handlerMap, workerExecutorService).setThreadPoolInfo(threadPoolInfo));
-
+        // add heart ping
+        pipeline.addLast("ping", new IdleStateHandler(15, 0, 0, TimeUnit.SECONDS));
     }
 
     public ThreadPoolInfo getThreadPoolInfo() {

@@ -18,6 +18,7 @@ import com.ms.coco.util.StringUtil;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.handler.timeout.IdleStateEvent;
 
 /**
  * RPC 服务端处理器（用于处理 RPC 请求）
@@ -34,6 +35,7 @@ public class RpcServerHandler extends SimpleChannelInboundHandler<RpcRequest> {
     private ThreadPoolInfo threadPoolInfo;
 
     public RpcServerHandler(Map<String, Object> handlerMap, ExecutorService workerExecutorService) {
+        super(true);
         this.handlerMap = handlerMap;
         this.workerExecutorService = workerExecutorService;
     }
@@ -68,6 +70,15 @@ public class RpcServerHandler extends SimpleChannelInboundHandler<RpcRequest> {
                     RpcErrorMsgConstant.SERVICE_REJECT, e).setRid(request.getRid()));
             ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
         }
+    }
+
+    @Override
+    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+        // 拦截链路空闲事件并处理心跳
+        if (evt instanceof IdleStateEvent) {
+            // 心跳处理
+        }
+        ctx.fireUserEventTriggered(evt);
     }
 
     @Override
