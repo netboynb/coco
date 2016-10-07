@@ -44,7 +44,6 @@ public class SimpleConnectionPool extends SimpleChannelPool implements Connectio
 	private static final Logger logger = LoggerFactory.getLogger(SimpleConnectionPool.class);
 
 	protected static final int DEFAULT_CONNECT_TIMEOUT = 2000;
-
 	protected final SocketAddress socketAddress;
 	protected final String host;
 	protected final int port;

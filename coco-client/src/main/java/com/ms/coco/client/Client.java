@@ -9,7 +9,9 @@ import com.ms.coco.bean.RpcResponse;
 * @func 
 */
 public interface Client {
-    public RpcResponse send(RpcRequest request);
+    void startHeartBeat();
+
+    RpcResponse send(RpcRequest request);
 
     void setService(String serviceName);
 

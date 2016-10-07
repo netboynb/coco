@@ -29,17 +29,22 @@ public class RpcProxy {
     private static final Logger LOGGER = LoggerFactory.getLogger(RpcProxy.class);
 
     private String serviceAddress;
-
     private ServiceDiscovery serviceDiscovery;
+    private Integer heartBeatRate = 15;// default 15s send one heartbeat
     private Map<String, Client> clientMap = new ConcurrentHashMap<>();
     private Long reqTimeout = 3000L;
+
     public RpcProxy(String serviceAddress) {
+        this();
         this.serviceAddress = serviceAddress;
     }
 
     public RpcProxy(ServiceDiscovery serviceDiscovery) {
+        this();
         this.serviceDiscovery = serviceDiscovery;
     }
+
+    private RpcProxy() {}
 
     public <T> T create(final Class<?> interfaceClass) {
         return create(interfaceClass, "");
@@ -55,7 +60,8 @@ public class RpcProxy {
         String host = array[0];
         int port = Integer.parseInt(array[1]);
         // 创建 RPC 客户端对象并发送 RPC 请求
-        Client client1 = new RpcNettyClient(host, port);
+        Client client1 = new RpcNettyClient(host, port, heartBeatRate);
+        client1.startHeartBeat();
         clientMap.put(key, client1);
         return client1;
     }
@@ -63,22 +69,18 @@ public class RpcProxy {
     @SuppressWarnings("unchecked")
     public <T> T create(final Class<?> interfaceClass, final String serviceVersion) {
         // 创建动态代理对象
-        return (T) Proxy.newProxyInstance(
-                interfaceClass.getClassLoader(),
-                new Class<?>[]{interfaceClass},
+        return (T) Proxy.newProxyInstance(interfaceClass.getClassLoader(), new Class<?>[] {interfaceClass},
                 new InvocationHandler() {
                     @Override
                     public Object invoke(Object proxy, Method method, Object[] args) throws Exception {
                         if (method == null) {
                             throw new RpcBizException("invoke method can not be null ");
                         }
-                        RpcRequest request = new RpcRequest();
-                        request.setInterfaceName(method.getDeclaringClass().getName());
-                        request.setServiceVersion(serviceVersion);
-                        request.setMethodName(method.getName());
-                        request.setParameterTypes(method.getParameterTypes());
-                        request.setParameters(args);
-                        request.setTimeout(reqTimeout);
+                        RpcRequest request = RpcRequest.newReq()
+                                .setInterfaceName(method.getDeclaringClass().getName())
+                                .setVersion(serviceVersion).setMethodName(method.getName())
+                                .setParameterTypes(method.getParameterTypes()).setParameters(args)
+                                .setTimeout(reqTimeout);
                         // 获取 RPC 服务地址
                         String serviceName = interfaceClass.getName();
                         if (serviceDiscovery != null) {
@@ -113,8 +115,7 @@ public class RpcProxy {
                         }
                         return response.getResult();
                     }
-                }
-        );
+                });
     }
 
     public Long getReqTimeout() {
@@ -123,6 +124,10 @@ public class RpcProxy {
 
     public void setReqTimeout(Long reqTimeout) {
         this.reqTimeout = reqTimeout;
+    }
+
+    public void setHeartBeatRate(Integer heartBeatRate) {
+        this.heartBeatRate = heartBeatRate;
     }
 
 }

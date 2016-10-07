@@ -89,6 +89,10 @@ public class RpcClientHandler extends SimpleChannelInboundHandler<RpcResponse> {
 		return writeFuture;
 	}
 
+    public void writeRequst(Channel channel, RpcRequest rpcRequest) {
+        channel.writeAndFlush(rpcRequest);
+    }
+
 	public void removeResponsePromise(long rid) {
 		responsePromiseContainer.removeResponsePromise(rid);
 	}

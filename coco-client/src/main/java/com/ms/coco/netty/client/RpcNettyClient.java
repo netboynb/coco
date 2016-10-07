@@ -16,10 +16,13 @@
 package com.ms.coco.netty.client;
 
 import java.net.InetSocketAddress;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.coco.utils.threads.CocoThreadUtils;
 import com.ms.coco.bean.RpcRequest;
 import com.ms.coco.bean.RpcResponse;
 import com.ms.coco.client.Client;
@@ -32,6 +35,7 @@ import com.ms.coco.netty.common.NettyUtil;
 import com.ms.coco.netty.common.ResponsePromise;
 import com.ms.coco.netty.common.RpcClientHandler;
 import com.ms.coco.netty.common.SimpleConnectionPool;
+import com.ms.coco.num.MsgType;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -51,9 +55,12 @@ public class RpcNettyClient implements Client {
     private ConnectionPool connectionPool;
     private String serviceName;
     private String ipPortKey;
+    private Integer heartBeatRate;
+    private AtomicLong pingCount = new AtomicLong(0);
 
-    public RpcNettyClient(String host, int port) {
+    public RpcNettyClient(String host, int port, Integer heartBeatRate) {
         this(new SimpleConnectionPool(NettyUtil.DEFAULT_BOOTSTRAP, new InetSocketAddress(host, port)));
+        this.heartBeatRate = heartBeatRate;
     }
 
     public RpcNettyClient(String host, int port, HandlerConfig handlerConfig) {
@@ -62,7 +69,8 @@ public class RpcNettyClient implements Client {
 
     public RpcNettyClient(ConnectionPool connectionPool) {
         this.connectionPool = connectionPool;
-        serverUrl = "netty://" + connectionPool.channelHost() + ":" + connectionPool.channelPort();
+        this.serverUrl = "netty://" + connectionPool.channelHost() + ":" + connectionPool.channelPort();
+        this.ipPortKey = connectionPool.channelHost() + ":" + connectionPool.channelPort();
     }
 
     @Override
@@ -75,6 +83,7 @@ public class RpcNettyClient implements Client {
 
         RpcClientHandler rpcClientHandler = null;
         request.setRid(rid);
+        request.setIpKey(ipPortKey);
         Channel channel = null;
         ChannelFuture writeFuture = null;
         // send netty request
@@ -138,5 +147,24 @@ public class RpcNettyClient implements Client {
     @Override
     public void setIpKey(String key) {
         this.ipPortKey = key;
+    }
+
+    @Override
+    public void startHeartBeat() {
+        CocoThreadUtils.getInstance().submitPingTask(new Runnable() {
+            @Override
+            public void run() {
+                long id = pingCount.incrementAndGet();
+                try {
+                    RpcRequest ping = RpcRequest.newPing().setRid(id).setIpKey(ipPortKey).setMsgType(MsgType.PING);
+                    Channel channel = connectionPool.acquireConnect();
+                    channel.writeAndFlush(ping);
+                    logger.info("id={},ping service={},ipPort={}", id, serviceName, ipPortKey);
+                } catch (Exception e) {
+                    logger.error("id={},ipPort={},schedule send ping error,info={}", id, ipPortKey, e.toString());
+                }
+
+            }
+        }, 5, heartBeatRate, TimeUnit.SECONDS);
     }
 }

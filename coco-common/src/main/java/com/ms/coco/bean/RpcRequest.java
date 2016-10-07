@@ -1,5 +1,7 @@
 package com.ms.coco.bean;
 
+import com.ms.coco.num.MsgType;
+
 /**
  * 封装 RPC 请求
  *
@@ -10,7 +12,8 @@ public class RpcRequest {
 
     private Long rid;
     private String interfaceName;
-    private String serviceVersion;
+    private MsgType msgType = MsgType.REQ;
+    private String version;
     private String methodName;
     private Class<?>[] parameterTypes;
     private Object[] parameters;
@@ -20,6 +23,69 @@ public class RpcRequest {
     private String serviceName;
     private Long timeout;
 
+    public static RpcRequest newReq() {
+        return new RpcRequest();
+    }
+
+    public static RpcRequest newPing() {
+        return new RpcRequest().setMsgType(MsgType.PING);
+    }
+    public RpcRequest() {
+        super();
+    }
+
+    public RpcRequest(Long rid, MsgType msgType, String version, String ipKey, String serviceName, Long timeout) {
+        super();
+        this.rid = rid;
+        this.msgType = msgType;
+        this.version = version;
+        this.ipKey = ipKey;
+        this.serviceName = serviceName;
+        this.timeout = timeout;
+    }
+
+
+    public RpcRequest(Long rid, String interfaceName, MsgType reqType, String version, String methodName,
+            Class<?>[] parameterTypes, Object[] parameters, String route, String hashValue, String ipKey,
+            String serviceName, Long timeout) {
+        super();
+        this.rid = rid;
+        this.interfaceName = interfaceName;
+        this.msgType = reqType;
+        this.version = version;
+        this.methodName = methodName;
+        this.parameterTypes = parameterTypes;
+        this.parameters = parameters;
+        this.route = route;
+        this.hashValue = hashValue;
+        this.ipKey = ipKey;
+        this.serviceName = serviceName;
+        this.timeout = timeout;
+    }
+
+
+    public MsgType getMsgType() {
+        return msgType;
+    }
+
+    public RpcRequest setMsgType(MsgType msgType) {
+        this.msgType = msgType;
+        return this;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public RpcRequest setVersion(String version) {
+        this.version = version;
+        return this;
+    }
+
+    public RpcRequest setTimeout(Long timeout) {
+        this.timeout = timeout;
+        return this;
+    }
 
     public Long getRid() {
         return rid;
@@ -34,32 +100,27 @@ public class RpcRequest {
         return interfaceName;
     }
 
-    public void setInterfaceName(String className) {
+    public RpcRequest setInterfaceName(String className) {
         this.interfaceName = className;
-    }
-
-    public String getServiceVersion() {
-        return serviceVersion;
-    }
-
-    public void setServiceVersion(String serviceVersion) {
-        this.serviceVersion = serviceVersion;
+        return this;
     }
 
     public String getMethodName() {
         return methodName;
     }
 
-    public void setMethodName(String methodName) {
+    public RpcRequest setMethodName(String methodName) {
         this.methodName = methodName;
+        return this;
     }
 
     public Class<?>[] getParameterTypes() {
         return parameterTypes;
     }
 
-    public void setParameterTypes(Class<?>[] parameterTypes) {
+    public RpcRequest setParameterTypes(Class<?>[] parameterTypes) {
         this.parameterTypes = parameterTypes;
+        return this;
     }
 
     public Object[] getParameters() {
