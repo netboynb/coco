@@ -66,7 +66,12 @@ public class RpcServerHandler extends SimpleChannelInboundHandler<RpcRequest> {
     }
 
     private void dealPing(ChannelHandlerContext ctx, RpcRequest request) {
+        // TODO deal with ping info
+        String ipKey = request.getIpKey();
+        String serviceName = request.getServiceName();
+        String version = request.getVersion();
 
+        LOGGER.info("ping info={}", request.toString());
     }
 
     private void dealReq(ChannelHandlerContext ctx, RpcRequest request) {
@@ -103,6 +108,7 @@ public class RpcServerHandler extends SimpleChannelInboundHandler<RpcRequest> {
     private void dealAck(ChannelHandlerContext ctx, RpcRequest request) {
 
     }
+
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
         super.userEventTriggered(ctx, evt);

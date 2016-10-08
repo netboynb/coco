@@ -72,6 +72,10 @@
 		    <artifactId>jboss-jaxrs-api_2.0_spec</artifactId>
 		    <version>1.0.0.Final</version>
 		</dependency>
+        <dependency>
+          <groupId>com.coco.utils</groupId>
+          <artifactId>CocoUtils</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

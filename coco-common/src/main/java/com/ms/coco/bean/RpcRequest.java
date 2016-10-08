@@ -1,5 +1,6 @@
 package com.ms.coco.bean;
 
+import com.coco.utils.web.BaseDO;
 import com.ms.coco.num.MsgType;
 
 /**
@@ -8,7 +9,7 @@ import com.ms.coco.num.MsgType;
  * @author wanglin/netboy
  * @since 1.0.0
  */
-public class RpcRequest {
+public class RpcRequest extends BaseDO {
 
     private Long rid;
     private String interfaceName;
