@@ -15,11 +15,11 @@ public class HelloDemo {
         HelloService helloService = rpcProxy.create(HelloService.class);
         String result = helloService.hello("World");
         System.out.println(result);
-
+        Thread.sleep(10000);
         HelloService helloService2 = rpcProxy.create(HelloService.class, "sample.hello2");
         String result2 = helloService2.hello("世界");
         System.out.println(result2);
-
+        Thread.sleep(10000);
         System.exit(0);
     }
 }

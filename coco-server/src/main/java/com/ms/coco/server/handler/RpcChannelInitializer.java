@@ -47,7 +47,8 @@ public class RpcChannelInitializer extends ChannelInitializer<SocketChannel> {
         // deal rpc request
         pipeline.addLast(new RpcServerHandler(handlerMap, workerExecutorService).setThreadPoolInfo(threadPoolInfo));
         // add heart ping,保证15s后先触发all_idle,在35s后就会触发IdleState.READER_IDLE（未读操作状态），此时服务器就会将通道关闭
-        pipeline.addLast("heartBeat", new IdleStateHandler(35, 25, 15, TimeUnit.SECONDS));
+        pipeline.addLast("ping-idle", new IdleStateHandler(15, 25, 35, TimeUnit.SECONDS));
+        pipeline.addLast("heartBeat", new HeartBeatHandler());
     }
 
     public ThreadPoolInfo getThreadPoolInfo() {

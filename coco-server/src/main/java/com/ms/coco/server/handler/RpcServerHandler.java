@@ -19,8 +19,6 @@ import com.ms.coco.util.StringUtil;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.handler.timeout.IdleState;
-import io.netty.handler.timeout.IdleStateEvent;
 
 /**
  * RPC 服务端处理器（用于处理 RPC 请求）
@@ -107,35 +105,6 @@ public class RpcServerHandler extends SimpleChannelInboundHandler<RpcRequest> {
 
     private void dealAck(ChannelHandlerContext ctx, RpcRequest request) {
 
-    }
-
-    @Override
-    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
-        super.userEventTriggered(ctx, evt);
-        // 拦截链路空闲事件并处理心跳
-        if (evt instanceof IdleStateEvent) {
-            // 心跳处理
-            IdleStateEvent event = (IdleStateEvent) evt;
-            if (event.state().equals(IdleState.READER_IDLE)) {
-                // 未进行读操作, 服务器端主动关闭连接
-                LOGGER.warn("READER_IDLE,client maybe not exist,we will close the chnnel");
-                if (ctx.channel().isOpen()) {
-                    ctx.close();
-                }
-                ctx.close();
-
-            } else if (event.state().equals(IdleState.WRITER_IDLE)) {
-                // 未进行写操作
-                LOGGER.warn("WRITER_IDLE, long time not write something to client");
-
-            } else if (event.state().equals(IdleState.ALL_IDLE)) {
-                // 未进行读写
-                LOGGER.warn("ALL_IDLE, long time not to write or read");
-                // 发送心跳消息
-                // MsgHandleService.getInstance().sendMsgUtil.sendHeartMessage(ctx);
-
-            }
-        }
     }
 
     @Override
