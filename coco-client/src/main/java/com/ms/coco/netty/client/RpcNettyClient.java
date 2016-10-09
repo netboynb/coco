@@ -155,13 +155,19 @@ public class RpcNettyClient implements Client {
             @Override
             public void run() {
                 long id = pingCount.incrementAndGet();
+                Channel channel = null;
                 try {
                     RpcRequest ping = RpcRequest.newPing().setRid(id).setIpKey(ipPortKey).setMsgType(MsgType.PING);
-                    Channel channel = connectionPool.acquireConnect();
+                    channel = connectionPool.acquireConnect();
                     channel.writeAndFlush(ping);
                     logger.info("id={},ping service={},ipPort={}", id, serviceName, ipPortKey);
+
                 } catch (Exception e) {
                     logger.error("id={},ipPort={},schedule send ping error,info={}", id, ipPortKey, e.toString());
+                } finally {
+                    if (channel != null) {
+                        connectionPool.releaseConnect(channel);
+                    }
                 }
 
             }

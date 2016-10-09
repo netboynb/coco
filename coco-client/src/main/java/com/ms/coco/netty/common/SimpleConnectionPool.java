@@ -19,10 +19,12 @@ package com.ms.coco.netty.common;
 
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.Maps;
 import com.ms.coco.exception.RpcFrameworkException;
 import com.ms.coco.exception.RpcNettyConnectLessException;
 
@@ -43,12 +45,12 @@ import io.netty.util.concurrent.Future;
 public class SimpleConnectionPool extends SimpleChannelPool implements ConnectionPool {
 	private static final Logger logger = LoggerFactory.getLogger(SimpleConnectionPool.class);
 
-	protected static final int DEFAULT_CONNECT_TIMEOUT = 2000;
+    protected static final int DEFAULT_CONNECT_TIMEOUT = 20000;
 	protected final SocketAddress socketAddress;
 	protected final String host;
 	protected final int port;
-
-    protected int connectTimeout = 2000; // default 2s
+    private Map<Integer, Channel> okChannels = Maps.newConcurrentMap();
+    protected int connectTimeout = 20000; // default 2s
 	protected ConnectionPoolContext poolContext;
 
 	public SimpleConnectionPool(Bootstrap bootstrap, SocketAddress remoteAddress) {
@@ -93,7 +95,10 @@ public class SimpleConnectionPool extends SimpleChannelPool implements Connectio
 	}
 
 	public Channel acquireConnect() throws RpcNettyConnectLessException {
-		Future<Channel> future = acquire();
+        // if (okChannels.size() > 0) {
+        // return okChannels.get(0);
+        // }
+        Future<Channel> future = acquire();
 		// see https://netty.io/4.0/api/io/netty/channel/ChannelFuture.html
 		// use bootstrap.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, connectTimeout);
 		// so await without timeout
@@ -119,13 +124,14 @@ public class SimpleConnectionPool extends SimpleChannelPool implements Connectio
 			if (channel == null) {
 				throw new RpcNettyConnectLessException("connect tcp=" + socketAddress + " fail within " + connectTimeout + "ms time, future.getNow return null!");
 			}
-
+            // okChannels.put(channel.hashCode(), channel);
 			return channel;
 		}
 	}
 
 	@Override
 	public void releaseConnect(Channel channel) {
+        // okChannels.remove(channel.hashCode());
 		Future<Void> future = release(channel);
 
 		//TODO  wait future done ?

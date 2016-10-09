@@ -37,14 +37,12 @@ public class HeartBeatHandler extends SimpleChannelInboundHandler<RpcRequest> {
                 ctx.close();
             } else if (event.state().equals(IdleState.WRITER_IDLE)) {
                 // 未进行写操作
-                LOGGER.warn("WRITER_IDLE, long time not write something to client");
-
+                LOGGER.info("WRITER_IDLE, long time not write something to client");
             } else if (event.state().equals(IdleState.ALL_IDLE)) {
                 // 未进行读写
-                LOGGER.warn("ALL_IDLE, long time not to write or read");
+                LOGGER.info("ALL_IDLE, long time not to write or read");
                 // 发送心跳消息
                 // MsgHandleService.getInstance().sendMsgUtil.sendHeartMessage(ctx);
-
             }
         }
     }

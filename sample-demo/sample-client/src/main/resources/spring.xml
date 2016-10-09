@@ -15,7 +15,7 @@
 
     <bean id="rpcProxy" class="com.ms.coco.client.RpcProxy">
         <constructor-arg name="serviceDiscovery" ref="serviceDiscovery"/>
-        <property name="heartBeatRate" value="1"/>
+        <property name="heartBeatRate" value="5"/>
     </bean>
 
 </beans>

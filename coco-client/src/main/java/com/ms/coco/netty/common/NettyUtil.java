@@ -21,8 +21,8 @@ public class NettyUtil {
 		Bootstrap bootstrap = new Bootstrap();
         bootstrap.group(new NioEventLoopGroup(threadNum));
 		bootstrap.channel(NioSocketChannel.class);
-        bootstrap.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000);
-        // bootstrap.option(ChannelOption.SO_KEEPALIVE, true);
+        // bootstrap.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000);
+        bootstrap.option(ChannelOption.SO_KEEPALIVE, true);
 		DEFAULT_BOOTSTRAP = bootstrap;
 	}
 
