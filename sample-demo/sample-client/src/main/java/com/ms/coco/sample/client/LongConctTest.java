@@ -14,12 +14,18 @@ import com.google.common.collect.Lists;
 import com.ms.coco.client.RpcProxy;
 import com.ms.coco.sample.api.HelloService;
 
-public class MutilClientThread {
+/**
+* @author wanglin/netboy
+* @version 创建时间：2016年10月9日 上午10:06:22
+* @func 
+*/
+public class LongConctTest {
+
     public class Task implements Callable<Long> {
         private int num;
         private CountDownLatch latch;
         RpcProxy rpcProxy;
-        long loopCount = 1000000;
+        long loopCount = 10000;
 
         public Task(final int num, CountDownLatch latch, RpcProxy rpcProxy) {
             this.num = num;
@@ -75,8 +81,8 @@ public class MutilClientThread {
         ApplicationContext context = new ClassPathXmlApplicationContext("spring.xml");
         final RpcProxy rpcProxy = context.getBean(RpcProxy.class);
         final HelloService helloService = rpcProxy.create(HelloService.class);
-        int threadNum = 10;
-        final int loopCount = 500000;
+        int threadNum = 1000;
+        final int loopCount = 2000000;
         ExecutorService executor = Executors.newFixedThreadPool(threadNum);
         final CountDownLatch latch = new CountDownLatch(threadNum);
         final AtomicLong threadCount = new AtomicLong(0);
@@ -86,37 +92,17 @@ public class MutilClientThread {
             for (int j = 0; j < threadNum; j++) {
                 Future<Msg> future = executor.submit(new Callable<Msg>() {
                     @Override
-                    public Msg call() {
-                        long start = System.currentTimeMillis();
-                        long num = threadCount.incrementAndGet();
-                        for (int i = 0; i < loopCount; i++) {
-                            String result = helloService.hello(" world");
-                            if (i % 10000 == 0) {
-                                System.out.println(num + "-" + i + " = " + result);
-                            }
-                            // System.out.println(num + "-" + i + " = " + result);
-                        }
-
-                        long time = System.currentTimeMillis() - start;
-                        double rt = (double) time / loopCount;
-                        double tps = (double) loopCount / ((double) time / 1000);
-                        Msg msg = new Msg(num, time, rt, tps);
-                        // Msg msg = new Msg();
-                        // resultList.add(msginfo);
+                    public Msg call() throws InterruptedException {
+                        String result = helloService.hello(" world");
+                        System.out.println(threadCount.incrementAndGet() + "=" + result);
+                        Thread.sleep(loopCount);
                         latch.countDown();
-                        return msg;
+                        return null;
                     }
                 });
                 resultList.add(future);
             }
             latch.await();
-            for (Future<Msg> future : resultList) {
-                Msg msg = future.get();
-                System.out.println("########################");
-                System.out.println("thread: " + msg.num);
-                System.out.println("rt: " + msg.qps);
-                System.out.println("tps: " + msg.tps);
-            }
         } catch (InterruptedException e) {
             e.printStackTrace();
         } finally {
@@ -125,4 +111,5 @@ public class MutilClientThread {
 
         System.exit(0);
     }
+
 }

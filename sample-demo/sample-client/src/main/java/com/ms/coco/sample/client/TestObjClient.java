@@ -22,14 +22,17 @@ public class TestObjClient {
         for (Long i = 0L; i < loopCount; i++) {
             try {
                 long s = System.currentTimeMillis();
-                // Person person = helloService.add(new Person(i, "林", "王"));
-                Person person = helloService.addWithException(new Person(i, "林", "王"));
+                Person person = helloService.add(new Person(i, "林", "王"));
+                // Person person = helloService.addWithException(new Person(i, "林", "王"));
                 // String name = helloService.hello("hello");
                 // Integer count = helloService.parseIntStr(i + "");
                 // count = helloService.parseIntStr(null);
                 // count = helloService.parseIntStr("");
                 long use = System.currentTimeMillis() - s;
-                System.out.println(" id = " + person.getId() + " use= " + use + "  ms " + person.getContent());
+                if (i % 10000 == 0) {
+                    System.out.println(" id = " + person.getId() + " use= " + use + "  ms " + person.getContent());
+                }
+
             } catch (Exception e) {
                 if (e instanceof RpcFrameworkException) {
                     RpcFrameworkException rpcFrameworkException = (RpcFrameworkException) e;

@@ -15,7 +15,7 @@ public class SingleThreadStrTest {
         RpcProxy rpcProxy = context.getBean(RpcProxy.class);
         String content =
                 "###World#启用熔断  达到阀值后启用熔断 丢掉所有的请求 一个 sleepWindowInMilliseconds 周期后 尝试放进一个请求，若成功则放进后续的请求 否则循环###";
-        int loopCount = 100000;
+        int loopCount = 1000000;
 
         long start = System.currentTimeMillis();
 
