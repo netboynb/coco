@@ -50,7 +50,8 @@ public class CocoServer implements ApplicationContextAware, InitializingBean {
 
     private Integer rpcPort = 8089;
     private String localIp;
-    private int ioWorkerNum = Runtime.getRuntime().availableProcessors() * 2;
+    private Integer bossNum = Runtime.getRuntime().availableProcessors();
+    private Integer ioWorkerNum = Runtime.getRuntime().availableProcessors() * 2 + 2;
     private ThreadPoolInfo threadPoolInfo = new ThreadPoolInfo();
     private boolean useRpc = true;
     private boolean useRestFul = true;
@@ -97,9 +98,10 @@ public class CocoServer implements ApplicationContextAware, InitializingBean {
     @Override
     public void afterPropertiesSet() throws Exception {
         if (useRpc) {
-            EventLoopGroup bossGroup = new NioEventLoopGroup();
+            EventLoopGroup bossGroup = new NioEventLoopGroup(bossNum);
             EventLoopGroup workerGroup = new NioEventLoopGroup(ioWorkerNum);
             try {
+
                 // init and start rpc netty server
                 LOGGER.info("rpc-netty-server will be started");
                 ExecutorService workerExecutorService =
