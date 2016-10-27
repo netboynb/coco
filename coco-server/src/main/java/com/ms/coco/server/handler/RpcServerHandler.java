@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import com.ms.coco.bean.RpcRequest;
 import com.ms.coco.bean.RpcResponse;
-import com.ms.coco.common.RpcRequestRunner;
+import com.ms.coco.common.RpcRequestTask;
 import com.ms.coco.common.ThreadPoolInfo;
 import com.ms.coco.exception.RpcErrorMsgConstant;
 import com.ms.coco.exception.RpcFrameworkException;
@@ -92,7 +92,7 @@ public class RpcServerHandler extends SimpleChannelInboundHandler<RpcRequest> {
         }
 
         try {
-            RpcRequestRunner bizTask = new RpcRequestRunner(ctx, request, response, serviceBean);
+            RpcRequestTask bizTask = new RpcRequestTask(ctx, request, response, serviceBean);
             workerExecutorService.submit(bizTask);
         } catch (RejectedExecutionException e) {
             LOGGER.error("rid={},netty server threadPool is busy,no thread left,threadPoolInfo={}", request.getRid(),

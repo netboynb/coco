@@ -16,14 +16,14 @@ import net.sf.cglib.reflect.FastMethod;
  * @version 创建时间：2016年5月26日 下午1:37:02
  * @func
  */
-public class RpcRequestRunner implements Runnable {
-    private static final Logger LOGGER = LoggerFactory.getLogger(RpcRequestRunner.class);
+public class RpcRequestTask implements Runnable {
+    private static final Logger LOGGER = LoggerFactory.getLogger(RpcRequestTask.class);
     private final ChannelHandlerContext ctx;
     private final RpcRequest rpcRequest;
     private Object serviceBean;
     private RpcResponse response;
 
-    public RpcRequestRunner(ChannelHandlerContext ctx, RpcRequest request, RpcResponse response, Object serviceBean) {
+    public RpcRequestTask(ChannelHandlerContext ctx, RpcRequest request, RpcResponse response, Object serviceBean) {
         this.ctx = ctx;
         this.rpcRequest = request;
         this.serviceBean = serviceBean;
